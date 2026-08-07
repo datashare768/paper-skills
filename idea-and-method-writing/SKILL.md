@@ -16,6 +16,11 @@ disable-model-invocation: true
 
 # Idea 构思与方法部分写作
 
+> **工作目录约定**：本 skill 涉及的 `workspace/`、`papers/` 等路径，均指**当前论文项目目录**
+> （用户正在工作的项目根目录，例如 `D:\PHD\Traffic_flow`）下新建的文件夹，
+> 绝不能创建在 `paper-skills` 这个 skill 定义仓库自身内部。
+> 最终产出的 `method.tex` 也放在当前项目目录下（如 `<项目根>/paper/method.tex`）。
+
 ## 总体流程（默认路径，先想 idea 再写方法）
 
 ```

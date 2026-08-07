@@ -42,6 +42,35 @@ paper-skills/
 
 在 Cursor 中，将某个阶段目录整体复制到 `~/.cursor/skills/`（个人）或项目的 `.cursor/skills/`（项目级），即可被 Agent 识别和调用。
 
+## 工作目录规范（重要）
+
+**`paper-skills` 仓库本身只存放 skill 定义（`SKILL.md` + `scripts/`），不存放任何具体论文项目的产出文件。**
+
+调用某个 skill 完成实际写作任务时，所有中间产物和最终文件（下载的参考论文、`text.md`、图片、
+`method.tex`、`experiments.tex`、`intro.tex`、`abstract.tex`、`conclusion.tex`、
+`related_work.tex`、`references.bib` 等）都应创建在**当前论文项目自己的目录下**，例如：
+
+```
+<你的论文项目>/                 # 例如 D:\PHD\Traffic_flow
+├── reference_paper/            # 参考文献 PDF（已有）
+├── papers/                     # skill 提取/下载的参考论文（text.md + figures/）
+│   ├── <paper-slug-1>/
+│   └── <paper-slug-2>/
+└── paper/                      # 本文写作产出（各章节独立 tex 文件）
+    ├── main.tex                # 主文档，用 \input{} 引入各章节
+    ├── abstract.tex
+    ├── intro.tex
+    ├── related_work.tex
+    ├── references.bib
+    ├── method.tex
+    ├── experiments.tex
+    └── conclusion.tex
+```
+
+SKILL.md 中出现的 `workspace/`、`papers/` 等相对路径，均指**当前论文项目目录下**新建的文件夹，
+不要在 `paper-skills` 仓库内创建这些文件夹（`paper-skills/.gitignore` 里的 `workspace/`、
+`workspace_*/` 规则只是兜底防误提交，正确用法是压根不在这个仓库里生成）。
+
 ## 同步到 GitHub
 
 ```bash
