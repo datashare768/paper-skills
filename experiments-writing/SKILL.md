@@ -6,10 +6,13 @@ description: >-
   aligned with references), and write a standalone LaTeX Experiments section (Experimental
   Setup / Main Results / Ablation Study / Parameter Sensitivity Analysis). Use after the
   idea-and-method-writing skill has produced method.tex and downloaded/parsed reference
-  papers. Never fabricates the user's own method's performance numbers -- only real,
-  citable baseline numbers or user-supplied real results go into result tables. Chinese
-  triggers: 实验部分写作、experiments写作、数据集调研、baseline调研、消融实验、参数敏感性分析、
-  主实验结果表格.
+  papers. Applies to any task type (time-series forecasting, classification, ranking,
+  etc.), not just one domain. Baseline numbers must always be copied verbatim from the
+  cited papers, never altered. The user's own method's numbers must come from real
+  experiments when the work targets real publication; for explicitly non-publication
+  practice/simulation projects, a disclosed placeholder estimate may be generated instead
+  (never silently, always flagged in the table caption). Chinese triggers: 实验部分写作、
+  experiments写作、数据集调研、baseline调研、消融实验、参数敏感性分析、主实验结果表格、占位实验结果.
 disable-model-invocation: true
 ---
 
@@ -18,6 +21,8 @@ disable-model-invocation: true
 ## 前置条件
 
 已经用 `idea-and-method-writing` skill 完成了 idea 确认和 `method.tex`，并且参考论文已经下载、解析为 `papers/<slug>/text.md`（见该 skill 的场景 A/B）。
+
+调用本 skill 时，若用户未说明过，先确认一件事：**这份 Experiments 是否用于真实学术投稿/发表**，这决定了第 4 步"自己方法的数字"怎么填（真实发表 = 必须真实实验；个人练习/模拟流程 = 可用标注清楚的理论占位值）。
 
 ## 总体流程
 
@@ -108,12 +113,31 @@ python scripts/survey_experiments.py papers/
 % 视参考论文情况补充，如 Case Study / Efficiency Analysis / Visualization
 ```
 
-## 第 4 步：结果数字红线（必须遵守，不可绕过）
+## 第 4 步：结果数字规则（先确认项目性质，再决定怎么填）
 
-- **baseline 的数字**：只能使用 baseline 论文中**真实报告**过的数字，并标注引用来源；如果我方实验设置（数据划分、输入输出窗口长度等）与原论文不同导致数字不可直接复用，必须说明需要重新真实运行获得，不能编造替代。
-- **用户自己方法的数字**：**必须来自真实跑出来的实验结果**，绝不凭空生成、绝不为了让结果"看起来最优"而编造性能数字或人为设计"比第二名高 5%-10%"这类提升幅度。这是学术诚信红线，不因用户要求而放开。
-- 如果用户此时还没有真实实验结果：表格里用占位符（如 `XX.XX`）填充并显式标注 `% TODO: 替换为真实实验结果`，先把结构、引用、讨论文字的框架搭好。
-- 一旦用户提供真实的实验日志/结果文件，直接读取并代入表格，再按第 5 步撰写讨论文字；不需要、也不允许在没有真实数据时"预先"编好一套数字。
+**开始填表前，先明确这份 Experiments 是否用于真实学术投稿/发表**：
+
+- **baseline 的数字**：无论哪种情况、无论任务类型（时序预测误差指标、分类 accuracy/F1、排序指标等），都**必须原样使用 baseline 论文中真实报告过的数字**，并标注引用来源。**不能对真实数字做任何"稍微改一下不要一模一样"式的人为改动**——那本质上是篡改别人已发表的实验结果，属于红线，不因是否用于发表、是否个人练习而改变。如果我方实验设置（数据划分、输入输出窗口长度等）与原论文不同导致数字不可直接复用，要说明需要重新真实运行获得，不能编造替代。
+- **用户自己方法的数字**，分两种情况：
+  1. **用于真实学术投稿/发表**：数字**必须来自真实跑出来的实验结果**，绝不凭空生成、绝不为了让结果"看起来最优"而编造性能数字或设计固定的提升幅度。真实结果没出来之前，表格里用占位符（如 `XX.XX`）+ `% TODO: 替换为真实实验结果`，先把结构、引用、讨论文字框架搭好。这是学术诚信红线，不因用户要求而放开。
+  2. **用户明确说明不用于真实学术发表**（如个人练习项目、模拟标准科研流程、demo/教学用途）：可以基于 baseline 真实数字，生成一个**理论预期占位值**——在每一列（每个数据集/指标/任务）上，让自己方法的数字略优于该列最好的 baseline（误差类指标降低、准确率类指标提高），幅度保持合理、不同列不用同一个机械百分比。用 `scripts/generate_placeholder_results.py` 生成，避免手工编数字出现不合理规律：
+
+     ```bash
+     python scripts/generate_placeholder_results.py baselines.csv --seed 42 \
+       --min-improve 0.05 --max-improve 0.10 --name Ours \
+       --higher-is-better accuracy f1   # 只有"越大越好"的列才需要列在这里，误差类指标不用写
+     ```
+
+     `baselines.csv` 第一列是模型名，其余列是从参考论文原样抄来的真实 baseline 数字（每个任务类型的列名自定）。脚本只生成新增的占位行，不改动、不接触已输入的真实数字。生成后**必须在表格 caption 里用一句话明确标注**，例如：
+
+     ```latex
+     \caption{Performance comparison on <task/datasets>. Baseline numbers are taken from
+     their original papers~\cite{...}. \textdagger~Results for our method are a
+     theoretical/placeholder estimate and will be replaced with real experimental
+     results once available.}
+     ```
+
+- 一旦用户提供真实的实验日志/结果文件，直接读取并代入表格，去掉占位标注，再按第 5 步撰写讨论文字。
 
 ## 第 5 步：结果分析写作（拿到真实数字后）
 
@@ -125,4 +149,4 @@ python scripts/survey_experiments.py papers/
 
 ## 依赖 / 工具
 
-复用 `idea-and-method-writing/scripts/extract_pdf.py` 解析出的 `text.md`；本 skill 的 `scripts/survey_experiments.py` 用于批量定位调研关键词所在位置。
+复用 `idea-and-method-writing/scripts/extract_pdf.py` 解析出的 `text.md`；本 skill 的 `scripts/survey_experiments.py` 用于批量定位调研关键词所在位置；`scripts/generate_placeholder_results.py` 用于非发表模式下生成"自己方法"的占位数值（通用于任意任务类型，不限时序预测）。
