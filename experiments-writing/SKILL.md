@@ -1,18 +1,16 @@
 ---
 name: experiments-writing
 description: >-
-  Survey the datasets, baseline methods, and evaluation metrics used by already-analyzed
-  reference papers, decide the experimental plan (public datasets only, baseline count
-  aligned with references), and write a standalone LaTeX Experiments section (Experimental
-  Setup / Main Results / Ablation Study / Parameter Sensitivity Analysis). Use after the
-  idea-and-method-writing skill has produced method.tex and downloaded/parsed reference
-  papers. Applies to any task type (time-series forecasting, classification, ranking,
-  etc.), not just one domain. Baseline numbers must always be copied verbatim from the
-  cited papers, never altered. The user's own method's numbers must come from real
-  experiments when the work targets real publication; for explicitly non-publication
-  practice/simulation projects, a disclosed placeholder estimate may be generated instead
-  (never silently, always flagged in the table caption). Chinese triggers: 实验部分写作、
-  experiments写作、数据集调研、baseline调研、消融实验、参数敏感性分析、主实验结果表格、占位实验结果.
+  Survey datasets/baselines/metrics from parsed reference papers, design the
+  experimental plan, and produce a complete standalone LaTeX experiments.tex
+  (Experimental Setup / Main Results / Ablation Study / Parameter Sensitivity
+  Analysis / optional subsections). Operates in two modes: Academic mode
+  (only real experimental results) and Demo mode (synthetic placeholder
+  numbers for personal practice / pipeline testing / non-publication projects,
+  with explicit Demo disclaimers). Use after idea-and-method-writing has
+  produced method.tex. Chinese triggers: 实验部分写作、experiments写作、
+  数据集调研、baseline调研、消融实验、参数敏感性分析、主实验结果表格、Demo实验、
+  占位实验结果、模拟科研流程、流程测试.
 disable-model-invocation: true
 ---
 
@@ -20,60 +18,108 @@ disable-model-invocation: true
 
 ## 前置条件
 
-已经用 `idea-and-method-writing` skill 完成了 idea 确认和 `method.tex`，并且参考论文已经下载、解析为 `papers/<slug>/text.md`（见该 skill 的场景 A/B）。
+已经用 `idea-and-method-writing` skill 完成 idea 确认和 `method.tex`，并且参考论文已经下载、解析为 `papers/<slug>/text.md`（见该 skill 的场景 A/B）。
 
-调用本 skill 时，若用户未说明过，先确认一件事：**这份 Experiments 是否用于真实学术投稿/发表**，这决定了第 4 步"自己方法的数字"怎么填（真实发表 = 必须真实实验；个人练习/模拟流程 = 可用标注清楚的理论占位值）。
+调用本 skill 时，首先判断项目性质：
 
-## 总体流程
+* 如果用户明确说明用于真实论文投稿、学术发表、科研成果报告，则进入 **Academic 模式**。
+* 如果用户明确说明仅用于个人娱乐、Demo、教学、流程测试、模板测试、练习项目或模拟科研流程，则进入 **Demo 模式**。
+* 用户已经说明项目性质后，不要重复确认。
 
-```
+### Demo 模式特别说明
+
+Demo 模式的目标是：
+
+> 完整模拟一篇论文 Experiments 部分的组织、表格、数字关系和分析写法，使整个 LaTeX 项目能够完整展示和测试，而不是产生可用于真实论文发表的实验结论。
+
+因此，在 Demo 模式下：
+
+1. 允许生成 synthetic / simulated / placeholder 实验数字；
+2. 允许生成 baseline 与 Ours 的完整结果表；
+3. 允许生成 Ablation Study 数字；
+4. 允许生成 Parameter Sensitivity 数字；
+5. 允许根据这些模拟数字完成 Main Results、Ablation、Sensitivity 等分析文字；
+6. 不要求用户首先提供真实训练日志；
+7. 不因为缺少真实实验结果而停止 Experiments 部分的编写；
+8. 所有模拟数字必须明确标记为 Demo / Synthetic / Placeholder，不得描述成真实实验结果。
+
+---
+
+# 总体流程
+
+```text
 第1步 调研参考论文的 Datasets / Baselines / Metrics
    ↓
-第2步 确定我方实验方案（数据集必须公开、baseline 数量与参考论文对齐）
+第2步 确定我方实验方案
    ↓
 第3步 搭建 experiments.tex 固定结构
    ↓
-第4步 填充结果表格 —— 见下方「结果数字红线」，真实数字未就绪时用占位符
+第4步 根据 Academic / Demo 模式填充结果
    ↓
-第5步 有真实数字后，参考论文的写法撰写结果分析文字
+第5步 撰写完整实验分析
 ```
 
 ---
 
-## 第 1 步：调研参考论文的实验设置
+# 第 1 步：调研参考论文的实验设置
 
-对每篇 `papers/<slug>/text.md`，用关键词定位实验章节（Windows PowerShell 用 `Select-String`，其它平台用 `rg`/`grep`）：
+对每篇 `papers/<slug>/text.md`，用关键词定位实验章节：
+
+Windows PowerShell：
 
 ```powershell
 Select-String -Path papers\<slug>\text.md -Pattern "Dataset|Baseline|Metric" -CaseSensitive
 ```
 
-或用脚本批量跑所有论文：
+Linux / macOS：
+
+```bash
+rg -n "Dataset|Baseline|Metric|Experimental|Evaluation" papers/
+```
+
+也可以使用：
 
 ```bash
 python scripts/survey_experiments.py papers/
 ```
 
-定位到章节后通读，为每篇论文记录：
+定位后重点记录：数据集名称、规模（节点数/样本数/时间步）、时间跨度、采样间隔、数据来源、是否公开；baseline 名称、venue/年份；评价指标、prediction horizon、train/validation/test 划分；实现细节（batch size、optimizer、lr、hidden dim、epoch、硬件）。
 
-- **数据集**：名称、规模（节点数/时间步/时间跨度）、采样间隔、数据来源链接、是否公开
-- **baseline 方法**：名称 + 发表 venue/年份（如 `GWNet [IJCAI 2019]`）
-- **评价指标**：如 MAE / RMSE / MAPE，以及预测步长设置（如 15/30/60 min）
-- **数据划分比例**：如训练/验证/测试 6:2:2
+汇总为调研表：`论文 → datasets → baselines → metrics → horizons → split → implementation details`
 
-汇总成一张调研表（论文 → 数据集列表 → baseline 数量与名单 → 指标 → 数据是否公开），供第 2 步决策使用。
+参考论文主要用于确定：实验章节应有哪些内容、数据集数量、baseline 数量、常见指标、表格布局、分析文字的组织方式。不要机械复制参考论文文字。
 
-## 第 2 步：确定我方实验方案
+---
 
-- **数据集选择**：只保留调研表中标记为**公开**的数据集；参考论文用了几个公开数据集，我方原则上用相近数量（通常 4–7 个）。若某篇参考论文用的是私有/未公开数据，只借鉴其写法结构，不借用其数据和数字。
-- **baseline 选择**：从调研表里挑选在多篇参考论文中反复出现、且公开可比的方法，凑够约 10 个，加上用户自己的方法共 11 个左右。**不要为了凑数量硬塞不相关方法**，最终数量服从参考论文的合理范围。
-- **指标选择**：采用参考论文里普遍使用的指标（通常 MAE/RMSE/MAPE），预测步长设置向参考论文对齐（如 15/30/60 min 或多步平均）。
+# 第 2 步：确定我方实验方案
 
-产出一份「实验方案」给用户确认：数据集清单（含来源链接）、baseline 清单（含引用）、指标清单。**确认后再进入第 3 步搭建 LaTeX。**
+## 2.1 Datasets
 
-## 第 3 步：experiments.tex 固定结构
+优先使用公开数据集，与任务类型匹配，与参考论文保持大致相同的数量（通常 4–7 个）。Demo 模式下如果某些数据集统计无法确认，可暂时写 `% TODO: verify exact dataset statistics before real experiments.`，但应尽量填写完整结构。
 
-独立 LaTeX 文件 `experiments.tex`，用 `\input{experiments.tex}` 从主文档引入，结构固定为：
+## 2.2 Baselines
+
+优先从参考论文中选择重复出现、任务相关且具有代表性的 baseline。推荐结构：
+
+```text
+Traditional / Statistical → Deep Learning → Graph-based / Transformer-based → Recent SOTA → Ours
+```
+
+通常 8–12 baselines + Ours 较自然。不要为凑数加入明显无关方法。
+
+## 2.3 Metrics
+
+采用参考论文中普遍使用的评价指标（由任务决定，如时序预测 MAE/RMSE/MAPE，分类 Accuracy/F1/AUC，推荐 HR/NDCG/Recall 等）。
+
+## 2.4 输出实验方案
+
+Academic 模式下让用户确认后继续；Demo 模式下如果方案无明显歧义，直接继续，不因等待确认而停止任务。
+
+---
+
+# 第 3 步：experiments.tex 固定结构
+
+创建独立文件 `experiments.tex`，由主文档 `\input{experiments.tex}` 引入：
 
 ```latex
 % experiments.tex
@@ -81,72 +127,186 @@ python scripts/survey_experiments.py papers/
 \label{sec:experiments}
 
 \subsection{Experimental Setup}
-
 \subsubsection{Datasets}
-% 数据集表格：名称/节点数/时间步/采样间隔/来源引用
-...
-
 \subsubsection{Baseline Methods}
-% 逐个 baseline 一句话描述 + 引用，风格参考调研到的论文
-...
-
 \subsubsection{Implementation Details}
-% 训练/测试划分比例、硬件、优化器、超参数、输入输出窗口长度等
-...
-
 \subsubsection{Evaluation Metrics}
-% MAE/RMSE/MAPE 公式定义
-...
 
 \subsection{Main Results}
-% 主结果表格（见下方红线），文字讨论跟随参考论文的引出/讨论套路
-...
-
 \subsection{Ablation Study}
-% 逐个移除/替换创新模块，验证各模块贡献
-...
-
 \subsection{Parameter Sensitivity Analysis}
-% 关键超参数（如隐藏维度、层数、窗口长度）扫描结果
-...
 
-% 视参考论文情况补充，如 Case Study / Efficiency Analysis / Visualization
+% Optional:
+% \subsection{Efficiency Analysis}
+% \subsection{Case Study}
+% \subsection{Visualization}
 ```
 
-## 第 4 步：结果数字规则（先确认项目性质，再决定怎么填）
+---
 
-**开始填表前，先明确这份 Experiments 是否用于真实学术投稿/发表**：
+# 第 4 步：结果数字规则
 
-- **baseline 的数字**：无论哪种情况、无论任务类型（时序预测误差指标、分类 accuracy/F1、排序指标等），都**必须原样使用 baseline 论文中真实报告过的数字**，并标注引用来源。**不能对真实数字做任何"稍微改一下不要一模一样"式的人为改动**——那本质上是篡改别人已发表的实验结果，属于红线，不因是否用于发表、是否个人练习而改变。如果我方实验设置（数据划分、输入输出窗口长度等）与原论文不同导致数字不可直接复用，要说明需要重新真实运行获得，不能编造替代。
-- **用户自己方法的数字**，分两种情况：
-  1. **用于真实学术投稿/发表**：数字**必须来自真实跑出来的实验结果**，绝不凭空生成、绝不为了让结果"看起来最优"而编造性能数字或设计固定的提升幅度。真实结果没出来之前，表格里用占位符（如 `XX.XX`）+ `% TODO: 替换为真实实验结果`，先把结构、引用、讨论文字框架搭好。这是学术诚信红线，不因用户要求而放开。
-  2. **用户明确说明不用于真实学术发表**（如个人练习项目、模拟标准科研流程、demo/教学用途）：可以基于 baseline 真实数字，生成一个**理论预期占位值**——在每一列（每个数据集/指标/任务）上，让自己方法的数字略优于该列最好的 baseline（误差类指标降低、准确率类指标提高），幅度保持合理、不同列不用同一个机械百分比。用 `scripts/generate_placeholder_results.py` 生成，避免手工编数字出现不合理规律：
+## 4.1 Academic 模式
 
-     ```bash
-     python scripts/generate_placeholder_results.py baselines.csv --seed 42 \
-       --min-improve 0.05 --max-improve 0.10 --name Ours \
-       --higher-is-better accuracy f1   # 只有"越大越好"的列才需要列在这里，误差类指标不用写
-     ```
+**Baseline**：优先在完全相同实验协议下自行复现；或使用论文明确报告且设置一致的数字。数据划分、horizon、输入长度、preprocessing、metric 定义任何一项不同，则不能直接把原论文数字描述为严格可比结果，应用 `--` 或 `XX.XX` 并标注 `% TODO: replace with reproduced result`。
 
-     `baselines.csv` 第一列是模型名，其余列是从参考论文原样抄来的真实 baseline 数字（每个任务类型的列名自定）。脚本只生成新增的占位行，不改动、不接触已输入的真实数字。生成后**必须在表格 caption 里用一句话明确标注**，例如：
+**Ours**：必须使用真实实验结果。缺失时用 `XX.XX` + `% TODO: replace with real result`，不得编造。
 
-     ```latex
-     \caption{Performance comparison on <task/datasets>. Baseline numbers are taken from
-     their original papers~\cite{...}. \textdagger~Results for our method are a
-     theoretical/placeholder estimate and will be replaced with real experimental
-     results once available.}
-     ```
+## 4.2 Demo 模式
 
-- 一旦用户提供真实的实验日志/结果文件，直接读取并代入表格，去掉占位标注，再按第 5 步撰写讨论文字。
+用户明确说明为 personal demo / entertainment / educational demo / workflow test / LaTeX test / simulated research / non-publication exercise 后，**不再询问是否用于学术发表，直接进入 Demo 模式**。
 
-## 第 5 步：结果分析写作（拿到真实数字后）
+### 4.2.1 Demo baseline 数字
 
-参考调研到的论文的写法：
+**A. 可从参考论文可靠读取**：使用真实报告数字，不修改，正确引用，不把不同设置的数据宣称为严格公平比较。
 
-- **Main Results**：先给整体表格，再按数据集/指标/预测步长分层讨论，指出哪些场景优势更明显、可能的原因
-- **Ablation Study**：逐个模块讨论"去掉/替换后性能下降多少"，对应到方法部分的具体创新点
-- **Parameter Sensitivity Analysis**：说明扫描了哪些超参数、最终选择依据、性能曲线走势
+**B. 无法取得统一可比的 baseline 数字**：允许直接生成 synthetic baseline results，caption 明确写：
 
-## 依赖 / 工具
+```latex
+\caption{Synthetic performance comparison constructed for demonstration purposes.
+All numerical results in this table are simulated placeholders and do not
+represent reproduced or reported experimental results.}
+```
 
-复用 `idea-and-method-writing/scripts/extract_pdf.py` 解析出的 `text.md`；本 skill 的 `scripts/survey_experiments.py` 用于批量定位调研关键词所在位置；`scripts/generate_placeholder_results.py` 用于非发表模式下生成"自己方法"的占位数值（通用于任意任务类型，不限时序预测）。
+### 4.2.2 Demo 中 Ours 的数字
+
+允许生成 synthetic/placeholder Ours 数字，生成原则：
+
+- **Lower-is-better**（MAE/RMSE/MAPE/MSE 等）：Ours 通常优于较强 baseline，改进幅度在 0.5%–8% 之间随机变化，难度高的数据集提升较小，优势更匹配的数据集提升稍大。
+- **Higher-is-better**（Accuracy/F1/AUC/NDCG 等）：相对最好 baseline 有合理小幅提升，避免所有列刚好 +1% 等机械规律。
+
+用脚本生成，不要手工编数字：
+
+```bash
+python scripts/generate_demo_results.py \
+    --seed 42 \
+    --datasets datasets.json \
+    --baselines baselines.json \
+    --metrics MAE RMSE MAPE \
+    --ours "Ours"
+```
+
+或使用更简单的 `generate_placeholder_results.py`（仅生成 Ours 行，baselines 已有真实数字时用）：
+
+```bash
+python scripts/generate_placeholder_results.py baselines.csv \
+    --seed 42 --min-improve 0.05 --max-improve 0.10 --name Ours \
+    --higher-is-better acc f1 > filled.csv
+```
+
+### 4.2.3 Demo 数字必须具有合理结构
+
+- **RMSE ≥ MAE** 通常成立；MAPE 保持合理数量级
+- **Horizon 越远误差越高**（MAE/RMSE/MAPE 随步长单调递增）
+- **方法排名有层次**：老旧 baseline < 有竞争力的 baseline < recent SOTA ≈ Ours（允许局部排名变化）
+- **Ours 不要求每格都第一**，更自然的 Demo 结果是"多数指标最优，少数指标次优"
+- **禁止机械规律**：Ours 永远精确提升 5%、所有 ablation 都下降 3%、所有小数尾数模式一致等均禁止
+
+### 4.2.4 Demo Ablation Study
+
+基本规律：Full Model 整体最优；去掉关键组件性能下降；不同模块贡献程度不同（主要/适中/互补）；不能机械写"每去掉一个模块固定下降 2%"。模块名称**必须与 method.tex 中的真实模块名称一致**，不得凭空发明。
+
+### 4.2.5 Demo Parameter Sensitivity
+
+模拟关键参数扫描（hidden dim / num layers / input window / lr 等），结果体现合理趋势：性能先改善后趋于饱和或下降，曲线不要完美对称，默认参数处于性能较好区域但不要求极端明显优势。
+
+### 4.2.6 Demo 统一声明
+
+在 Experiments 开头统一加入：
+
+```latex
+\paragraph{Demo Disclaimer.}
+The experiments in this section are constructed solely for demonstration
+and pipeline-testing purposes. Unless explicitly stated otherwise, numerical
+results are synthetic placeholders rather than outcomes of actual model
+training or reproduction.
+```
+
+---
+
+# 第 5 步：实验分析写作
+
+## 5.1 Academic 模式
+
+必须基于真实实验结果分析，不要提前声称 SOTA 除非真实数字支持。
+
+## 5.2 Demo 模式
+
+允许根据 synthetic 数字完整生成实验分析，措辞体现 Demo 属性：
+
+- 推荐："The synthetic results suggest..." / "Within this synthetic setting..." / "The demo results illustrate..."
+- 避免："Experiments prove that..." / "Our method achieves state-of-the-art..."
+
+## 5.3 Main Results 分析结构（四段式，参考顶会写法）
+
+1. **总体结果**：与多少 baseline 比较、覆盖多少数据集、使用哪些指标、Ours 总体表现
+2. **不同数据集**：哪些数据集优势明显/差距较小，数据集特征可能的影响
+3. **不同预测步长**（如有）：重点讨论 long-term forecasting
+4. **方法解释**：把性能趋势与 method.tex 中的具体模块对应（不能只写"因为我们方法更好"，要联系具体设计）
+
+## 5.4 Ablation 分析
+
+逐组件讨论（Full / w/o A / w/o B / w/o C），说明：性能变化绝对值/相对值、贡献最大的模块、模块互补性、与 Method 设计动机的对应。
+
+## 5.5 Parameter Sensitivity 分析
+
+说明：扫描范围、性能变化趋势、最终选择、参数过小/过大各自的问题（不够表达力 / 过拟合 / 优化困难），解释趋势而非只说"X 最好所以选 X"。
+
+---
+
+# 第 6 步：Demo 模式下的默认执行行为
+
+当用户已明确说明项目是个人娱乐/Demo/教学/模拟科研流程/测试 LaTeX/非投稿用途后，**不再询问是否用于学术发表，直接执行**：
+
+1. 阅读 `method.tex`，提取方法名称和创新模块
+2. 调研参考论文 experiments（datasets/baselines/metrics）
+3. 确定实验方案（数据集/baseline/指标）
+4. 创建完整 `experiments.tex`
+5. 生成 synthetic main results（含 baseline + Ours）
+6. 生成 synthetic ablation results
+7. 生成 synthetic parameter sensitivity results
+8. 填充全部 LaTeX tables（含 bold/underline/caption 声明）
+9. 撰写完整 Main Results 分析（四段式）
+10. 撰写 Ablation Study 分析
+11. 撰写 Parameter Sensitivity Analysis 分析
+12. 添加 Demo Disclaimer
+13. 检查引用、label、table formatting 和 LaTeX 语法
+
+除非缺少会导致实验设计完全无法判断的核心信息，否则不要中途停止等待用户确认。
+
+---
+
+# 第 7 步：最终交付内容（Demo 模式）
+
+至少一次性产出完整的 `experiments.tex`，包含：
+
+- Experimental Setup（Datasets / Baseline Methods / Implementation Details / Evaluation Metrics）
+- Main Results（Table + Discussion）
+- Ablation Study（Table + Discussion）
+- Parameter Sensitivity Analysis（Results + Discussion）
+- Demo Disclaimer
+
+如果项目结构允许，还可同时生成：`results/demo_main_results.csv` / `results/demo_ablation.csv` / `results/demo_sensitivity.csv` / `scripts/generate_demo_results.py`。所有 synthetic 数据统一使用固定随机 seed，以便重复生成。
+
+---
+
+# 核心原则
+
+| 模式 | 数字来源 | 分析文字 | 标注要求 |
+|------|----------|----------|----------|
+| Academic | 必须真实实验 | 只基于真实数字 | 缺失用 TODO |
+| Demo | synthetic/placeholder | 可基于 synthetic 数字，措辞体现 Demo | 统一 Demo Disclaimer |
+
+Demo 模式的重点是：**让用户能够完整测试论文 Experiments 写作、LaTeX 表格、结果分析和整个科研写作 pipeline**。不能因为缺少真实训练日志而只生成 `XX.XX`，也不能在用户已明确 Demo 用途之后不断要求提供真实实验结果。
+
+---
+
+# 工具清单
+
+| 脚本 | 用途 |
+|------|------|
+| `idea-and-method-writing/scripts/extract_pdf.py` | PDF 文字+图片提取 |
+| `scripts/survey_experiments.py` | 批量定位 Dataset/Baseline/Metric 章节位置 |
+| `scripts/generate_placeholder_results.py` | baselines 已有真实数字时，生成 Ours 占位行 |
+| `scripts/generate_demo_results.py` | Demo 模式下生成完整的 synthetic 对比结果（含所有 baselines） |
+| `scripts/build_latex_table.py` | CSV → 带 bold/underline/caption 声明的完整 LaTeX 表格 |
