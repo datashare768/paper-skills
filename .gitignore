@@ -1,4 +1,5 @@
 workspace/
+workspace_*/
 __pycache__/
 *.pyc
 .DS_Store
