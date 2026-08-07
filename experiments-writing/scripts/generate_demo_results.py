@@ -84,9 +84,13 @@ def is_higher_better(metric: str, hib_set: set[str]) -> bool:
     return metric.upper() in hib_set
 
 
-def base_value(metric: str, difficulty: float, hib_set: set[str], rng: random.Random) -> float:
+def base_value(metric: str, difficulty: float, hib_set: set[str], rng: random.Random,
+               override_ranges: dict[str, tuple[float, float]] | None = None) -> float:
     key = metric.upper()
-    lo, hi = BASE_RANGES.get(key, (0.5, 5.0))
+    if override_ranges and key in override_ranges:
+        lo, hi = override_ranges[key]
+    else:
+        lo, hi = BASE_RANGES.get(key, (0.5, 5.0))
     if is_higher_better(metric, hib_set):
         # harder dataset → lower accuracy
         v = hi - difficulty * (hi - lo) + rng.uniform(-0.005, 0.005) * (hi - lo)
@@ -149,9 +153,12 @@ def generate(
         for ds in datasets:
             for h_idx, horizon in enumerate(horizons):
                 metric_vals: dict[str, float] = {}
+                ds_override = None
+                if ds.get("base_ranges"):
+                    ds_override = {k.upper(): tuple(v) for k, v in ds["base_ranges"].items()}
                 for metric in metrics:
                     higher = is_higher_better(metric, hib_set)
-                    bv = base_value(metric, ds["difficulty"], hib_set, rng)
+                    bv = base_value(metric, ds["difficulty"], hib_set, rng, ds_override)
                     sf = strength_factor(method["strength"], higher)
                     hf = horizon_factor(h_idx, len(horizons), higher, rng)
                     noise = rng.uniform(-0.015, 0.015)

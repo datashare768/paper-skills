@@ -53,16 +53,51 @@ disable-model-invocation: true
 ## 场景 A：解析已给的参考文献 PDF
 
 1. 为本次 idea 建一个工作目录，例如 `workspace/<idea-slug>/papers/`。
-2. 对每篇 PDF 运行文字+图片提取脚本：
+2. 对每篇**已发表的学术论文 PDF**（双栏排版、有公式/图表/参考文献的正式论文），优先用 MinerU 做结构化提取（效果远优于纯文字抽取，能正确恢复双栏阅读顺序、保留公式/表格/图注结构）：
+
+```bash
+conda activate mineru_env   # 一次性环境搭建见下方「MinerU 环境搭建」
+python scripts/extract_paper_mineru.py <pdf路径> workspace/<idea-slug>/papers/ --slug <paper-slug>
+```
+
+输出目录 `workspace/<idea-slug>/papers/<paper-slug>/auto/`：
+- `<paper-slug>.md` —— 全文，阅读顺序正确，公式已识别为行内 LaTeX（`$$...$$`），章节标题保留层级
+- `<paper-slug>_content_list.json` —— 结构化条目（类型/页码/bbox/标题层级），可编程定位标题、作者、摘要、参考文献
+- `tables/Table<N>_<标题>.md` —— 每个表格单独一个 markdown 文件，文件名取自论文里表格自己的编号+标题
+- `figures/Fig<N>_<标题>.png` —— 每个图单独一张图片，文件名取自论文里图自己的编号+标题；多子图 (a)(b)(c)(d) 会按原版面位置自动拼回一张完整图
+- `images/` —— MinerU 原始裁剪图（中间产物，一般不需要直接用）
+- 无编号/无标题的装饰性裁剪图会被自动丢弃，不会出现在 `figures/` 里
+
+若某篇 PDF 不是正式发表论文（如内部草稿、无标准排版），或 MinerU 环境不可用，退回使用通用提取脚本：
 
 ```bash
 python scripts/extract_pdf.py <pdf路径> workspace/<idea-slug>/papers/<paper-slug>/
 ```
 
-输出：`<paper-slug>/text.md`（全文文字，按页分段）+ `<paper-slug>/figures/pageN_imgM.png`（所有嵌入图片）。
+输出：`<paper-slug>/text.md`（全文文字，按页分段）+ `<paper-slug>/figures/pageN_imgM.png`（所有嵌入图片，未分类）。
 
-3. 逐篇通读 `text.md`，重点提取：**要解决的问题、核心方法/模块、创新点、实验结论**。
+3. 逐篇通读 `<paper-slug>.md`（或 `text.md`），重点提取：**要解决的问题、核心方法/模块、创新点、实验结论**；需要具体数字/表格时直接读 `tables/` 下对应文件；需要插图时直接引用 `figures/` 下对应文件。
 4. 进入「产出组合创新 idea」步骤。
+
+### MinerU 环境搭建（一次性）
+
+Windows 下 MinerU 依赖较重（torch/transformers/onnxruntime），建议单独建一个 conda 环境，避免和其它项目的 torch 版本冲突：
+
+```bash
+conda create -n mineru_env python=3.11 -y
+conda activate mineru_env
+pip install -U "mineru[pipeline]" six pandas tabulate lxml beautifulsoup4 pillow
+# 国内网络下模型下载走 HuggingFace 经常超时，切到 ModelScope 源：
+# PowerShell: $env:MINERU_MODEL_SOURCE="modelscope"
+# 或者写入用户环境变量长期生效: setx MINERU_MODEL_SOURCE modelscope
+```
+
+首次运行 `extract_paper_mineru.py` 时会自动下载版面/公式/OCR 模型（几百 MB～1GB），只需下载一次。若机器有 NVIDIA GPU 且装了 CUDA 版 torch，会自动用 GPU 加速；纯 CPU 环境也能跑，只是速度慢一些（每篇论文约 2-4 分钟）。
+
+**已知局限**：
+- 极长文件名 + Windows 路径长度限制（260 字符）可能导致提取失败——`extract_paper_mineru.py` 已经自动处理（先复制成短文件名再提取）。
+- 个别字体的 "ffi/ff" 连字符会被错误识别为丢字母（如 "traffic"→"trafic"），`organize_mineru_output.py` 已内置常见学术词的自动修复（`fix_ligatures.py`），但不保证覆盖所有生僻词，重要数字/术语建议交叉核对原文 PDF。
+- 极复杂的多级表头/合并单元格表格，OCR 结构识别偶尔会有单元格错位，关键数字表格建议人工核对一遍。
 
 ## 场景 B：只给了研究方向，需要检索顶会论文
 
@@ -80,7 +115,7 @@ python scripts/arxiv_download.py <arxiv_id> --dest workspace/<idea-slug>/papers/
 python scripts/arxiv_download.py <arxiv_id> --dest workspace/<idea-slug>/papers/ --pdf       # 备选：直接下 PDF
 ```
 
-4. 对下载到的 PDF 运行场景 A 中的 `extract_pdf.py` 提取文字和图片（若下载的是 LaTeX 源码包，直接读取 `.tex` 文字部分，图片在源码目录里，无需再跑 PDF 提取）。
+4. 对下载到的 PDF 运行场景 A 中的 `extract_paper_mineru.py`（优先）或 `extract_pdf.py`（备选）提取文字和图片（若下载的是 LaTeX 源码包，直接读取 `.tex` 文字部分，图片在源码目录里，无需再跑 PDF 提取）。
 5. 进入「产出组合创新 idea」步骤。
 
 ## 场景 C / 第 5 步：撰写方法部分（idea 已确定后）
@@ -171,4 +206,5 @@ python scripts/arxiv_download.py <arxiv_id> --dest workspace/<idea-slug>/papers/
 
 ## 依赖
 
-`pip install pymupdf requests`（PyMuPDF 用于 PDF 文字/图片提取，requests 用于 arXiv API 与下载）。
+- `pip install pymupdf requests`（PyMuPDF 用于通用 PDF 备用提取，requests 用于 arXiv API 与下载）。
+- MinerU 相关依赖单独装在 `mineru_env` conda 环境（见上方「MinerU 环境搭建」）：`mineru[pipeline]`, `six`, `pandas`, `tabulate`, `lxml`, `beautifulsoup4`, `pillow`。

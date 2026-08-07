@@ -210,6 +210,15 @@ Experimental results <S5: 实验结论，2–3句>
 
 用 `\input{abstract.tex}` 从主文档引入，或直接将内容嵌入主文档 `\begin{abstract}...\end{abstract}` 块中。
 
+> **⚠️ Elsevier `cas-sc` / `cas-dc` 模板已知坑**：这两个模板的 `abstract` 环境（定义在
+> `cas-common.sty`）通过 `\verbatimwrite` 把环境体逐字符原样写入 `\jobname.abs`，再用
+> `\file_input:n` 读回排版。这个原始写入阶段**不会正常展开 `\input{abstract}`**（实测
+> 会把结果吃掉、只剩残缺文本或空文件），导致编译出的摘要显示成字面量 `abstract` 或空白。
+> **解决方法**：对 `cas-sc`/`cas-dc` 模板，不要在主文档的 `\begin{abstract}...\end{abstract}`
+> 里写 `\input{abstract}`，而是把 `abstract.tex` 的纯文本内容直接复制粘贴进主文档的
+> abstract 环境中（保留独立的 `abstract.tex` 作为本 skill 的规范产出文件，两者内容保持同步）。
+> 编译后务必用 `pdftotext` 或直接读取 PDF 检查摘要页是否显示了真实文字而不是字面量 "abstract"。
+
 ---
 
 ## 参考示例（用户提供）

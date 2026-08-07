@@ -56,6 +56,156 @@ def fmt_cell(v: float, best: float, second: float, decimals: int) -> str:
     return s
 
 
+def build_table_transposed(
+    rows: list[list[str]],
+    header: list[str],
+    label: str,
+    caption: str,
+    cite: str,
+    higher_cols: set[str],
+    decimals: int,
+    ours_label: str = "Ours",
+) -> str:
+    """Metric-as-row / Model-as-column layout, e.g.:
+
+        Metric  Model1  Model2  ...  Ours
+        MAE     x.xx    x.xx    ...  x.xx
+        RMSE    ...
+        MAPE    ...
+
+    matching the style used by DeepSTUQ-style tables (Dataset | Metrics | model...).
+    Best/second-best are computed row-wise (across models) for each metric.
+    """
+    model_names = [r[0] for r in rows]
+    metric_cols = header[1:]
+    values: list[list[float]] = [[float(x) for x in r[1:]] for r in rows]
+    n_models = len(model_names)
+
+    ours_idx = next((i for i, n in enumerate(model_names) if n == "Ours"), None)
+
+    col_spec = "l|" + "c" * n_models
+    out: list[str] = []
+    out.append(r"\begin{table}[t]")
+    out.append(r"  \centering")
+    out.append(r"  \small")
+    out.append(r"  \setlength{\tabcolsep}{4pt}")
+
+    ours_note = (
+        r" $^\dagger$\,Our method's results are theoretical/placeholder estimates "
+        r"generated from published baseline data for personal practice "
+        r"simulation purposes---\textit{not for academic publication}---and will be "
+        r"replaced with real experimental results once available."
+    )
+    full_cap = (
+        r"  \caption{" + caption
+        + (r" Baseline numbers cited from~\cite{" + cite + r"}." if cite else "")
+        + ours_note + "}"
+    )
+    out.append(full_cap)
+    out.append(r"  \label{" + label + "}")
+    out.append(r"  \resizebox{\textwidth}{!}{%")
+    out.append(r"  \begin{tabular}{" + col_spec + "}")
+    out.append(r"    \toprule")
+
+    display_names = [
+        r"\textbf{" + ours_label + r"}$^\dagger$" if n == "Ours" else n
+        for n in model_names
+    ]
+    out.append("    Metric & " + " & ".join(display_names) + r" \\")
+    out.append(r"    \midrule")
+
+    for c, metric in enumerate(metric_cols):
+        row_vals = [values[ri][c] for ri in range(len(rows))]
+        hib = metric in higher_cols
+        best, second = best_and_second(row_vals, hib)
+        cells = [fmt_cell(v, best, second, decimals) for v in row_vals]
+        safe_metric = metric.replace("_", r"\_")
+        out.append(f"    {safe_metric} & " + " & ".join(cells) + r" \\")
+
+    out.append(r"    \bottomrule")
+    out.append(r"  \end{tabular}%")
+    out.append(r"  }")
+    out.append(r"\end{table}")
+    return "\n".join(out)
+
+
+def build_table_transposed_multi(
+    dataset_tables: list[tuple[str, list[str], list[list[str]]]],
+    label: str,
+    caption: str,
+    cite: str,
+    higher_cols: set[str],
+    decimals: int,
+    ours_label: str = "Ours",
+) -> str:
+    """Combine several per-dataset (header, rows) tables produced in the same
+    Metric-as-row / Model-as-column layout into a single table with a
+    left-most 'Dataset' column spanning 3 rows via \\multirow, matching the
+    style used by e.g. STPGNN Table 2 / DeepSTUQ Table II, where PEMS03/04/07/08
+    (etc.) all appear stacked in one table instead of one table per dataset.
+
+    dataset_tables: list of (dataset_name, header, rows) where header is
+    ["model", metric1, metric2, ...] and rows are [[model, v1, v2, ...], ...]
+    for that one dataset (all datasets must share the same model list/order).
+    """
+    model_names = [r[0] for r in dataset_tables[0][2]]
+    metric_cols = dataset_tables[0][1][1:]
+    n_models = len(model_names)
+
+    col_spec = "l|l|" + "c" * n_models
+    out: list[str] = []
+    out.append(r"\begin{table}[t]")
+    out.append(r"  \centering")
+    out.append(r"  \small")
+    out.append(r"  \setlength{\tabcolsep}{4pt}")
+
+    ours_note = (
+        r" $^\dagger$\,Our method's results are theoretical/placeholder estimates "
+        r"generated from published baseline data for personal practice "
+        r"simulation purposes---\textit{not for academic publication}---and will be "
+        r"replaced with real experimental results once available."
+    )
+    full_cap = (
+        r"  \caption{" + caption
+        + (r" Baseline numbers cited from~\cite{" + cite + r"}." if cite else "")
+        + ours_note + "}"
+    )
+    out.append(full_cap)
+    out.append(r"  \label{" + label + "}")
+    out.append(r"  \resizebox{\textwidth}{!}{%")
+    out.append(r"  \begin{tabular}{" + col_spec + "}")
+    out.append(r"    \toprule")
+
+    display_names = [
+        r"\textbf{" + ours_label + r"}$^\dagger$" if n == "Ours" else n
+        for n in model_names
+    ]
+    out.append("    Dataset & Metric & " + " & ".join(display_names) + r" \\")
+    out.append(r"    \midrule")
+
+    for di, (ds_name, header, rows) in enumerate(dataset_tables):
+        values: list[list[float]] = [[float(x) for x in r[1:]] for r in rows]
+        for c, metric in enumerate(metric_cols):
+            row_vals = [values[ri][c] for ri in range(len(rows))]
+            hib = metric in higher_cols
+            best, second = best_and_second(row_vals, hib)
+            cells = [fmt_cell(v, best, second, decimals) for v in row_vals]
+            safe_metric = metric.replace("_", r"\_")
+            if c == 0:
+                ds_cell = rf"\multirow{{{len(metric_cols)}}}{{*}}{{{ds_name}}}"
+            else:
+                ds_cell = ""
+            out.append(f"    {ds_cell} & {safe_metric} & " + " & ".join(cells) + r" \\")
+        if di < len(dataset_tables) - 1:
+            out.append(r"    \midrule")
+
+    out.append(r"    \bottomrule")
+    out.append(r"  \end{tabular}%")
+    out.append(r"  }")
+    out.append(r"\end{table}")
+    return "\n".join(out)
+
+
 def build_table(
     rows: list[list[str]],
     header: list[str],
@@ -66,10 +216,27 @@ def build_table(
     col_groups: Optional[list[tuple[str, int]]],
     dataset_groups: Optional[list[tuple[str, int]]],
     decimals: int,
+    ours_label: str = "Ours",
 ) -> str:
     model_col = header[0]
     metric_cols = header[1:]
     n_metrics = len(metric_cols)
+
+    # when columns are grouped by dataset (e.g. "PEMS04_MAE"), strip the
+    # "<DatasetName>_" prefix for display and for --higher-is-better matching,
+    # so the metric header row shows plain "MAE"/"RMSE"/"MAPE" once per group.
+    display_metric_cols = list(metric_cols)
+    bare_metric_cols = list(metric_cols)
+    if dataset_groups:
+        pos = 0
+        for ds_name, dw in dataset_groups:
+            prefix = ds_name + "_"
+            for c in range(pos, pos + dw):
+                if metric_cols[c].startswith(prefix):
+                    bare = metric_cols[c][len(prefix):]
+                    display_metric_cols[c] = bare
+                    bare_metric_cols[c] = bare
+            pos += dw
 
     # parse values; keep "Ours" row separate for bold/underline calc
     model_names = [r[0] for r in rows]
@@ -80,7 +247,7 @@ def build_table(
     # determine bold/underline per column
     col_best: list[float] = []
     col_sec:  list[float] = []
-    for c, col_name in enumerate(metric_cols):
+    for c, col_name in enumerate(bare_metric_cols):
         col_vals = [values[ri][c] for ri in range(len(rows))]
         hib = col_name in higher_cols
         b, s = best_and_second(col_vals, hib)
@@ -98,7 +265,7 @@ def build_table(
         col_spec = "".join(col_spec_parts)
 
     out: list[str] = []
-    out.append(r"\begin{table*}[t]")
+    out.append(r"\begin{table}[t]")
     out.append(r"  \centering")
     out.append(r"  \small")
     out.append(r"  \setlength{\tabcolsep}{4pt}")
@@ -160,8 +327,10 @@ def build_table(
             pos += grp_w
         out.append("    " + "".join(cg_cmidrule))
 
-    # metric names row
-    out.append("    & " + " & ".join(metric_cols) + r" \\")
+    # metric names row (escape underscores so raw column names like "15min_MAE"
+    # don't break LaTeX outside math mode)
+    safe_metric_cols = [c.replace("_", r"\_") for c in display_metric_cols]
+    out.append("    & " + " & ".join(safe_metric_cols) + r" \\")
     out.append(r"    \midrule")
 
     # ---- data rows ----
@@ -170,7 +339,7 @@ def build_table(
         if ri == ours_idx:
             out.append(r"    \midrule")
         display_name = (
-            r"\textbf{Ours}$^\dagger$" if name == "Ours" else name
+            r"\textbf{" + ours_label + r"}$^\dagger$" if name == "Ours" else name
         )
         cells = [fmt_cell(vals[c], col_best[c], col_sec[c], decimals)
                  for c in range(n_metrics)]
@@ -178,13 +347,14 @@ def build_table(
 
     out.append(r"    \bottomrule")
     out.append(r"  \end{tabular}")
-    out.append(r"\end{table*}")
+    out.append(r"\end{table}")
     return "\n".join(out)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("csv_path")
+    parser.add_argument("csv_path", nargs="?", default=None,
+                        help="Single CSV (omit when using --combine).")
     parser.add_argument("--label", default="tab:main_results")
     parser.add_argument("--caption", default="Performance comparison.")
     parser.add_argument("--cite", default="")
@@ -195,27 +365,79 @@ def main() -> None:
                         help="e.g. 'PEMS03:9,PEMS04:9'")
     parser.add_argument("--decimals", type=int, default=2)
     parser.add_argument("--out", default="")
+    parser.add_argument("--transpose", action="store_true",
+                        help="Metric-as-row / Model-as-column layout "
+                             "(DeepSTUQ/STPGNN-style), instead of the default "
+                             "Model-as-row / Metric-as-column layout.")
+    parser.add_argument("--combine", nargs="*", default=None,
+                        help="Combine several per-dataset CSVs (same models/metrics) "
+                             "into a single table with a 'Dataset' column, "
+                             "format 'Name1:path1.csv' 'Name2:path2.csv' ...")
+    parser.add_argument("--ours-label", default="Ours",
+                        help="Display name to use for the 'Ours' row/column "
+                             "(e.g. the actual model name instead of 'Ours').")
     args = parser.parse_args()
+
+    if args.combine:
+        dataset_tables = []
+        for spec in args.combine:
+            ds_name, ds_path = spec.split(":", 1)
+            with open(ds_path, newline="", encoding="utf-8-sig") as f:
+                reader = csv.reader(f)
+                ds_header = next(reader)
+                ds_rows = list(reader)
+            dataset_tables.append((ds_name, ds_header, ds_rows))
+        latex = build_table_transposed_multi(
+            dataset_tables=dataset_tables,
+            label=args.label,
+            caption=args.caption,
+            cite=args.cite,
+            higher_cols=set(args.higher_is_better),
+            decimals=args.decimals,
+            ours_label=args.ours_label,
+        )
+        if args.out:
+            with open(args.out, "w", encoding="utf-8") as f:
+                f.write(latex + "\n")
+            print(f"Written to {args.out}", file=sys.stderr)
+        else:
+            if hasattr(sys.stdout, "reconfigure"):
+                sys.stdout.reconfigure(encoding="utf-8")
+            print(latex)
+        return
 
     with open(args.csv_path, newline="", encoding="utf-8-sig") as f:
         reader = csv.reader(f)
         header = next(reader)
         rows = list(reader)
 
-    col_groups    = parse_groups(args.col_groups)    if args.col_groups    else None
-    dataset_groups = parse_groups(args.dataset_groups) if args.dataset_groups else None
+    if args.transpose:
+        latex = build_table_transposed(
+            rows=rows,
+            header=header,
+            label=args.label,
+            caption=args.caption,
+            cite=args.cite,
+            higher_cols=set(args.higher_is_better),
+            decimals=args.decimals,
+            ours_label=args.ours_label,
+        )
+    else:
+        col_groups    = parse_groups(args.col_groups)    if args.col_groups    else None
+        dataset_groups = parse_groups(args.dataset_groups) if args.dataset_groups else None
 
-    latex = build_table(
-        rows=rows,
-        header=header,
-        label=args.label,
-        caption=args.caption,
-        cite=args.cite,
-        higher_cols=set(args.higher_is_better),
-        col_groups=col_groups,
-        dataset_groups=dataset_groups,
-        decimals=args.decimals,
-    )
+        latex = build_table(
+            rows=rows,
+            header=header,
+            label=args.label,
+            caption=args.caption,
+            cite=args.cite,
+            higher_cols=set(args.higher_is_better),
+            col_groups=col_groups,
+            dataset_groups=dataset_groups,
+            decimals=args.decimals,
+            ours_label=args.ours_label,
+        )
 
     if args.out:
         with open(args.out, "w", encoding="utf-8") as f:
