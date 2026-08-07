@@ -12,6 +12,9 @@ paper-skills/
 ├── idea-and-method-writing/   # 阶段：idea 构思 + 方法部分写作
 │   ├── SKILL.md
 │   └── scripts/
+├── experiments-writing/       # 阶段：实验部分写作
+│   ├── SKILL.md
+│   └── scripts/
 └── ...                        # 后续阶段陆续添加
 ```
 
@@ -20,6 +23,7 @@ paper-skills/
 | 目录 | 说明 |
 |------|------|
 | `idea-and-method-writing/` | 根据参考文献 PDF 或研究方向，检索/解析顶会论文，组合创新生成 idea，并完成方法部分写作 |
+| `experiments-writing/` | 调研参考论文的数据集/baseline/指标，确定实验方案，撰写 Experiments 部分（结果数字必须真实，不编造） |
 
 ## 使用方式
 
