@@ -17,6 +17,9 @@ paper-skills/
 │   └── scripts/
 ├── conclusion-writing/        # 阶段：结论部分写作
 │   └── SKILL.md
+├── related-work-writing/      # 阶段：相关工作写作 + BibTeX 生成
+│   ├── SKILL.md
+│   └── scripts/
 └── ...                        # 后续阶段陆续添加
 ```
 
@@ -27,6 +30,7 @@ paper-skills/
 | `idea-and-method-writing/` | 根据参考文献 PDF 或研究方向，检索/解析顶会论文，组合创新生成 idea，并完成方法部分写作 |
 | `experiments-writing/` | 调研参考论文的数据集/baseline/指标，确定实验方案，撰写 Experiments 部分（Academic/Demo 双模式） |
 | `conclusion-writing/` | 生成独立的 conclusion.tex，两段式（主结论 + 简短局限展望），严格参考顶会写法，不冗余 |
+| `related-work-writing/` | 从参考论文提取被引文献 → CrossRef 查 BibTeX → 整理 40-50 条 references.bib → 写 3-subsection 的 related_work.tex |
 
 ## 使用方式
 
