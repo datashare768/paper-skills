@@ -20,6 +20,8 @@ paper-skills/
 ├── related-work-writing/      # 阶段：相关工作写作 + BibTeX 生成
 │   ├── SKILL.md
 │   └── scripts/
+├── introduction-writing/      # 阶段：引言写作（5-7段 + 4条贡献 + 论文结构段）
+│   └── SKILL.md
 └── ...                        # 后续阶段陆续添加
 ```
 
@@ -31,6 +33,7 @@ paper-skills/
 | `experiments-writing/` | 调研参考论文的数据集/baseline/指标，确定实验方案，撰写 Experiments 部分（Academic/Demo 双模式） |
 | `conclusion-writing/` | 生成独立的 conclusion.tex，两段式（主结论 + 简短局限展望），严格参考顶会写法，不冗余 |
 | `related-work-writing/` | 从参考论文提取被引文献 → CrossRef 查 BibTeX → 整理 40-50 条 references.bib → 写 3-subsection 的 related_work.tex |
+| `introduction-writing/` | 分析参考论文 Introduction 写法 → 按 7 段结构写 intro.tex（背景→挑战→综述→动机→方法→4条贡献→结构段） |
 
 ## 使用方式
 
