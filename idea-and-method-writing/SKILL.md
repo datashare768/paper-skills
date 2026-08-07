@@ -91,29 +91,36 @@ python scripts/arxiv_download.py <arxiv_id> --dest workspace/<idea-slug>/papers/
 4. **产出独立的 LaTeX 文件**（不要直接写进主文档正文），命名如 `method.tex`，用 `\input{method.tex}` 或 `\include{method}` 从主文档引入。文件需可独立编译审阅（含必要的 `\subsection`/`\subsubsection` 结构、公式、图表占位、算法环境）。
 5. **方法部分必须包含至少一个算法伪代码**，用 `algorithm` + `algorithmic`（或 `algorithm2e`）宏包按参考论文中出现的伪代码风格给出，需要在正文中用 `Algorithm~\ref{...}` 引用并做文字说明（输入、输出、每一步在做什么、对应哪个创新模块）。
 
-模板骨架（按参考论文实际风格调整章节数量与命名）：
+**固定的 subsection 顺序**（除非参考论文另有明显更优的组织方式，否则默认按此顺序写，模型名称用 idea 里确定的名字替换 `<ModelName>`）：
+
+1. `Problem Formulation` —— 第一个 subsection，形式化定义输入输出、符号表、任务目标（数学表达为主，模仿参考论文的符号体系风格）。
+2. `<ModelName> Overview` —— 第二个 subsection，用一段话+整体框架图说明模型总体 pipeline：数据先经过什么、再经过什么、最后输出什么，把各模块串起来但不展开细节，图注呼应 idea 的组合+创新模块。
+3. 从第三个 subsection 起，**逐个模块展开写作**，每个模块一个 subsection（命名用模块的实际名称，例如 `Spatial-Temporal Encoder`、`<创新模块名称>` 等），内容包含：该模块解决什么子问题、公式推导、与前一模块的输入输出衔接、（若为创新点）与已有方法的区别。
+4. 最后可选一个算法伪代码 subsection 或者把伪代码放在 Overview 之后统一给出（视参考论文习惯而定）。
+
+模板骨架：
 
 ```latex
 % method.tex
 \section{Methodology}
 \label{sec:method}
 
-% 1. 引出：problem formulation / 整体框架图描述，模仿参考论文的引出方式
 \subsection{Problem Formulation}
+% 符号定义、输入输出、任务目标，模仿参考论文的符号体系
 ...
 
-\subsection{Overall Framework}
-% 插入框架图 \includegraphics，呼应 idea 中的组合+创新模块
+\subsection{<ModelName> Overview}
+% 插入整体框架图 \includegraphics，一段话串起所有模块的数据流，不展开细节
 ...
 
-% 2. 逐模块展开，每个模块一个 subsection，公式 + 图表按参考论文习惯呼应
-\subsection{<模块A名称>}
+% 逐模块展开，每个模块一个 subsection，公式 + 图表按参考论文习惯呼应
+\subsection{<模块A实际名称>}
 ...
 
-\subsection{<模块B / 创新点名称>}
+\subsection{<模块B / 创新模块实际名称>}
 ...
 
-% 3. 算法伪代码，风格参考顶会论文
+% 算法伪代码，风格参考顶会论文
 \begin{algorithm}[t]
 \caption{<算法名称>}
 \label{alg:method}
@@ -124,7 +131,7 @@ python scripts/arxiv_download.py <arxiv_id> --dest workspace/<idea-slug>/papers/
 \end{algorithmic}
 \end{algorithm}
 
-% 4. 收尾/小结，呼应最初的问题或创新点（如参考论文有此习惯）
+% 收尾/小结，呼应最初的问题或创新点（如参考论文有此习惯）
 ```
 
 ---
