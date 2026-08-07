@@ -22,6 +22,8 @@ paper-skills/
 │   └── scripts/
 ├── introduction-writing/      # 阶段：引言写作（5-7段 + 4条贡献 + 论文结构段）
 │   └── SKILL.md
+├── abstract-writing/          # 阶段：摘要写作（单段 250-350词，5句式结构）
+│   └── SKILL.md
 └── ...                        # 后续阶段陆续添加
 ```
 
@@ -34,6 +36,7 @@ paper-skills/
 | `conclusion-writing/` | 生成独立的 conclusion.tex，两段式（主结论 + 简短局限展望），严格参考顶会写法，不冗余 |
 | `related-work-writing/` | 从参考论文提取被引文献 → CrossRef 查 BibTeX → 整理 40-50 条 references.bib → 写 3-subsection 的 related_work.tex |
 | `introduction-writing/` | 分析参考论文 Introduction 写法 → 按 7 段结构写 intro.tex（背景→挑战→综述→动机→方法→4条贡献→结构段） |
+| `abstract-writing/` | 读 method.tex + experiments.tex → 单段摘要 abstract.tex（背景→不足→提出→技术→实验，250–350词） |
 
 ## 使用方式
 
