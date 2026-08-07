@@ -15,6 +15,8 @@ paper-skills/
 ├── experiments-writing/       # 阶段：实验部分写作
 │   ├── SKILL.md
 │   └── scripts/
+├── conclusion-writing/        # 阶段：结论部分写作
+│   └── SKILL.md
 └── ...                        # 后续阶段陆续添加
 ```
 
@@ -23,7 +25,8 @@ paper-skills/
 | 目录 | 说明 |
 |------|------|
 | `idea-and-method-writing/` | 根据参考文献 PDF 或研究方向，检索/解析顶会论文，组合创新生成 idea，并完成方法部分写作 |
-| `experiments-writing/` | 调研参考论文的数据集/baseline/指标，确定实验方案，撰写 Experiments 部分（结果数字必须真实，不编造） |
+| `experiments-writing/` | 调研参考论文的数据集/baseline/指标，确定实验方案，撰写 Experiments 部分（Academic/Demo 双模式） |
+| `conclusion-writing/` | 生成独立的 conclusion.tex，两段式（主结论 + 简短局限展望），严格参考顶会写法，不冗余 |
 
 ## 使用方式
 
