@@ -18,6 +18,12 @@ disable-model-invocation: true
 - `experiments.tex` 已完成（提取数据集数量、baseline 数量、关键数值结果）
 - `intro.tex` 可选参考（用于确认任务描述措辞一致性）
 
+> **写作规范（强制）**：起草完成后，必须对照 `../WRITING_STANDARDS.md` 逐条自查
+> （数值/术语/逻辑一致性、禁止分点与破折号、禁止中式英语套语与无依据夸大断言、
+> 加粗仅限规范场景等）。摘要尤其要核对："consistently outperforms all baselines"
+> 一类断言必须与 `experiments.tex` 中的表格数据核对，若并非全面领先则改为
+> "achieves the best or second-best result on the majority of..." 等可验证措辞。
+
 ---
 
 ## 总体流程

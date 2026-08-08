@@ -20,6 +20,14 @@ disable-model-invocation: true
 - `method.tex` 已完成（用于确定 3 个 subsection 的主题）
 - 参考论文已解析为 `papers/<slug>/text.md`（用于提取被引文献列表）
 
+> **写作规范（强制）**：起草完成后，必须对照 `../WRITING_STANDARDS.md` 逐条自查
+> （禁止分点、禁止破折号、术语与其他章节保持一致、避免中式英语套语与无依据断言）。
+> Related Work 各 subsection 必须是连续散文综述，不能用列表逐条列举被引方法。
+> `\section{Related Work}` 之后、第一个 `\subsection` 之前必须先有一段引导段落，
+> 概括这一节要综述哪几条技术路线（对应各 subsection 主题）并说明会指出局限、
+> 将本文方法与之对比，不能直接从第一个 `\subsection` 开始（见
+> `WRITING_STANDARDS.md` 第 12 章）。
+
 ---
 
 ## 总体流程
@@ -31,7 +39,7 @@ disable-model-invocation: true
    ↓
 第3步 用 CrossRef API 查询并生成规范 BibTeX，去重后保存 references.bib（40–50 条）
    ↓
-第4步 按 3 个主题分配文献，写 related_work.tex
+第4步 写一段 section 引导段落（点名 3 个主题 + 路线图），再按 3 个主题分配文献，写 related_work.tex
 ```
 
 ---
@@ -99,6 +107,14 @@ python scripts/fetch_bibtex.py raw_refs.json \
 % related_work.tex
 \section{Related Work}
 \label{sec:related}
+
+% 引导段落（2-4句，禁止直接从 \subsection 开始）：概括本节要综述的几条技术
+% 路线（对应下面各 subsection 的主题），并说明会指出其局限、将本文方法与之
+% 对比，例如 "This section reviews N lines of work that underpin the design
+% of <ModelName>: <主题1>, <主题2>, and <主题3>. For each, we summarize
+% representative methods, highlight their limitations, and position
+% <ModelName> relative to them."
+...
 
 \subsection{<主题1>}
 \label{subsec:rw1}

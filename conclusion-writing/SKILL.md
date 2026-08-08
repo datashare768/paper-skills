@@ -18,6 +18,12 @@ disable-model-invocation: true
 
 已完成 `method.tex`（方法）和 `experiments.tex`（实验），读取它们提取：方法名称、核心模块/创新点、实验数据集数量和名称、对比 baseline 数量和类别、主要结果亮点（最优指标/数据集）。
 
+> **写作规范（强制）**：起草完成后，必须对照 `../WRITING_STANDARDS.md` 逐条自查。
+> 结论段中总结实验效果的措辞必须与 `experiments.tex` 的真实数据一致，不能笼统写
+> "consistently outperforms all baselines"，应改为如实反映主表结果的可验证表述
+> （如"achieves the best or second-best result on the majority of evaluated metric
+> combinations"）。
+
 ---
 
 ## 固定结构（两段，独立文件 `conclusion.tex`）

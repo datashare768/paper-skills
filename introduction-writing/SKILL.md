@@ -20,6 +20,11 @@ disable-model-invocation: true
 - `method.tex` 已完成（用于提取模型名称、核心模块、贡献点）
 - `experiments.tex` 已完成（用于提取数据集数量/类型、实验结果亮点）
 
+> **写作规范（强制）**：起草完成后，必须对照 `../WRITING_STANDARDS.md` 逐条自查。
+> 特别注意：**只有贡献点列表（contributions）可以用 `enumerate`/`itemize`**，
+> 其余段落（背景、挑战、现有方法综述、动机、方法概述）必须是连续散文，不能出现
+> `(i)(ii)(iii)`、`First,/Second,/Third,` 等分点式表达，也不能使用破折号插入语。
+
 ---
 
 ## 总体流程
@@ -178,7 +183,15 @@ In summary, the main contributions of this paper are as follows:
 ```
 
 规则：
-- 第1条：提出整体模型
+- 第1条：提出整体模型（可以先用一句话点出建模视角/问题设定，但整条的落点必须是
+  "we propose <ModelName>, a ..."，即以提出方法收尾）。
+  **第1条禁止写成纯粹的问题陈述/gap identification**（如 "We identify and address
+  a gap ...: the lack of ..."、"We observe that existing methods fail to ..."），
+  这类句子只指出了问题而没有说明做了什么，读起来像是把 P4（Motivation）段落又
+  重复了一遍，必须改写为以"we propose/we formulate ... and propose ..."为主干、
+  在从句里带出问题动机的句子（可参考："We formulate <task> from a <视角>
+  perspective that explicitly <解决的问题>, and propose <ModelName>, a unified
+  framework that ..."）。
 - 第2、3条：提出关键模块（对应 method.tex 中的核心创新，不超过 2 条模块级别的贡献）
 - 第4条：实验结论（固定最后一条）
 - 每条用"We propose / We design / We introduce / Extensive experiments"等动词开头，不重复
@@ -208,6 +221,8 @@ future research directions.
 - [ ] P4 末句明确说明"这导致我们提出..."，不含方法细节
 - [ ] P5 末句包含实验结论数字（数据集数 N、baseline 数 M）
 - [ ] P6 贡献列表正好 4 条，第1条整体，第2/3条模块，第4条实验
+- [ ] P6 第1条不是纯问题陈述/gap identification（不以 "We identify.../We observe
+      that existing methods fail..." 收尾），而是落在 "we propose <ModelName>" 上
 - [ ] P7 section 编号与主文档 label 一致
 - [ ] 全文不出现"In this paper, we first... then... finally..."流水账
 - [ ] 总字数在 600–1000 词之间（不要过短也不要过长）

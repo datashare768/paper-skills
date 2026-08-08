@@ -21,6 +21,17 @@ disable-model-invocation: true
 > 绝不能创建在 `paper-skills` 这个 skill 定义仓库自身内部。
 > 最终产出的 `method.tex` 也放在当前项目目录下（如 `<项目根>/paper/method.tex`）。
 
+> **写作规范（强制）**：`method.tex` 起草完成后，必须对照 `../WRITING_STANDARDS.md`
+> 逐条自查，尤其是：模块概述段落禁止用 `(i)(ii)(iii)`/`First,/Second,/Third,` 分点，
+> 应改写为连贯散文；检查全文数学符号是否有复用冲突（同一字母在不同小节表示不同的量）；
+> 关键公式加 `\label{}`，供 `experiments-writing` 用 `\eqref{}` 引用，不要用硬编码编号；
+> 正文首次提出模型全称/缩写时不要加粗；`\section{Methodology}` 之后、第一个
+> `\subsection{Problem Formulation}` 之前必须先有一段引导段落（点名方法全称/缩写 +
+> 一句话概括核心机制 + 本节组织顺序），不能直接从 `\subsection` 开始（见
+> `WRITING_STANDARDS.md` 第 12 章）；该引导段落及全文提出方法处禁止使用
+> `Motivated by the lack of ...` 这类绕弯子开场，应直接以 `We propose ...` 起句
+> （见 `WRITING_STANDARDS.md` 第 4 章）。
+
 ## 总体流程（默认路径，先想 idea 再写方法）
 
 ```
@@ -131,8 +142,11 @@ python scripts/arxiv_download.py <arxiv_id> --dest workspace/<idea-slug>/papers/
 4. **产出独立的 LaTeX 文件**（不要直接写进主文档正文），命名如 `method.tex`，用 `\input{method.tex}` 或 `\include{method}` 从主文档引入。文件需可独立编译审阅（含必要的 `\subsection`/`\subsubsection` 结构、公式、图表占位、算法环境）。
 5. **方法部分必须包含至少一个算法伪代码**，用 `algorithm` + `algorithmic`（或 `algorithm2e`）宏包按参考论文中出现的伪代码风格给出，需要在正文中用 `Algorithm~\ref{...}` 引用并做文字说明（输入、输出、每一步在做什么、对应哪个创新模块）。
 
-**固定的 subsection 顺序**（除非参考论文另有明显更优的组织方式，否则默认按此顺序写，模型名称用 idea 里确定的名字替换 `<ModelName>`）：
+**固定结构**（除非参考论文另有明显更优的组织方式，否则默认按此顺序写，模型名称用 idea 里确定的名字替换 `<ModelName>`）：
 
+0. **引导段落**（在 `\section{Methodology}` 之后、第一个 `\subsection` 之前，不算
+   独立 subsection）：点名 `<ModelName>` 全称/缩写、一句话概括其核心机制、一句话
+   给出本节路线图，篇幅 2-4 句，不重复 Introduction 已详述的背景/局限。
 1. `Problem Formulation` —— 第一个 subsection，形式化定义输入输出、符号表、任务目标（数学表达为主，模仿参考论文的符号体系风格）。
 2. `<ModelName> Overview` —— 第二个 subsection，用一段话+整体框架图说明模型总体 pipeline：数据先经过什么、再经过什么、最后输出什么，把各模块串起来但不展开细节，图注呼应 idea 的组合+创新模块。
 3. 从第三个 subsection 起，**逐个模块展开写作**，每个模块一个 subsection（命名用模块的实际名称，例如 `Spatial-Temporal Encoder`、`<创新模块名称>` 等），内容包含：该模块解决什么子问题、公式推导、与前一模块的输入输出衔接、（若为创新点）与已有方法的区别。
@@ -144,6 +158,12 @@ python scripts/arxiv_download.py <arxiv_id> --dest workspace/<idea-slug>/papers/
 % method.tex
 \section{Methodology}
 \label{sec:method}
+
+% 引导段落（2-4句，禁止直接从 \subsection 开始）：点名 <ModelName> 全称/缩写 +
+% 一句话概括核心机制 + 本节组织顺序（先形式化问题，再给整体框架，再逐模块展开）。
+% 直接以 "This section presents ..."/"We propose ..." 起句，不要用
+% "Motivated by the lack of ..." 这类绕弯子开场重述局限。
+...
 
 \subsection{Problem Formulation}
 % 符号定义、输入输出、任务目标，模仿参考论文的符号体系

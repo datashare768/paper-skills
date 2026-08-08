@@ -20,6 +20,29 @@ disable-model-invocation: true
 
 已经用 `idea-and-method-writing` skill 完成 idea 确认和 `method.tex`，并且参考论文已经下载、解析为 `papers/<slug>/text.md`（见该 skill 的场景 A/B）。
 
+> **写作规范（强制）**：`experiments.tex` 起草完成后，必须对照 `../WRITING_STANDARDS.md`
+> 逐条自查，尤其是：
+> - baseline 介绍、ablation 变体介绍禁止用 `itemize` 列表，必须写成连续散文；
+> - 每个 `Table~\ref{tab:xxx}`/`Fig.~\ref{fig:xxx}` 必须先在文中被引用，再出现表格/图；
+> - 文中任何"提升 X%--Y%"的区间描述，必须用表格真实数值重新计算，不能凭感觉估计；
+>   若本文方法在某个数据集/指标上未全面领先，措辞要如实反映（不能写
+>   "consistently outperforms"）；
+> - 表格中 `\textbf{}` 只能标最优值、`\underline{}` 标次优值，不能因为是"本文方法"
+>   就整行加粗而不核对是否真的是最优；正文提及消融变体名称用 `\emph{}` 而非 `\textbf{}`；
+> - 除 Introduction 结尾的路线图段落外，正文、Algorithm 的 `\Comment{}`、以及所有
+>   `\caption{}` 内一律禁止出现 `Section~\ref{...}` 这类章节交叉引用，需改写为不依赖
+>   编号的描述性语言（见 `WRITING_STANDARDS.md` 第 7 章）；
+> - 图/表的 `\caption{}` 内不能交叉引用其他图/表（如 `Fig.~\ref{fig:other}`/
+>   `Table~\ref{tab:other}`），跨图表关联要么改写成描述性语言，要么把 `\ref` 移到
+>   caption 外的正文段落（见 `WRITING_STANDARDS.md` 第 8 章）；
+> - 表格单元格内禁止出现 `\cite`/`\citep`，需要标出处必须挪到 `\caption{}`（见
+>   `WRITING_STANDARDS.md` 第 9 章）；
+> - 涉及用 Python 脚本（matplotlib 等）生成插图（`figs/*.pdf`）的场景，必须对照
+>   `WRITING_STANDARDS.md` 第 10 章「用脚本生成图片的绘图规范」检查 DPI（统一 600）、
+>   字体（统一 Times New Roman）、坐标轴刻度（数值跨度不均时用等间距索引位置）、
+>   是否已尽量在同一张图内展示多个代表性数据集、是否避免了遮挡与杂乱水印、
+>   面板标注与字号是否规范。
+
 调用本 skill 时，首先判断项目性质：
 
 * 如果用户明确说明用于真实论文投稿、学术发表、科研成果报告，则进入 **Academic 模式**。
@@ -262,6 +285,8 @@ python scripts/generate_placeholder_results.py baselines.csv \
 
 模拟关键参数扫描（hidden dim / num layers / input window / lr 等），结果体现合理趋势：性能先改善后趋于饱和或下降，曲线不要完美对称，默认参数处于性能较好区域但不要求极端明显优势。
 
+**优先用图而非表格展示**：若同一超参数需要跨多个数据集展示趋势（通常顶刊/顶会更看重多数据集普适性），应画成折线图（每个数据集一条曲线）而不是逐参数开表格，具体绘图规范（DPI/字体/等间距刻度/多数据集配色/双 y 轴处理量纲差异）见 `../WRITING_STANDARDS.md` 第 10.2–10.3 节。每个超参数一个子图，多个超参数可以拼成 2×3 或 1×N 网格figure，用 `(a)(b)(c)...` 标注，共享一个全局图例。曲线数值优先展示**真实量纲的绝对指标**（如 MAE 原始数值），而不是默认转换成相对百分比；只有当数据集间量纲差异导致单一 y 轴无法同时清晰呈现时，才使用双 y 轴（见 10.3），仍不够清晰时才退化为相对百分比。多个数据集的曲线形状不应是同一条曲线的等比缩放，应体现该数据集自身特征（节点数、序列长度、空间密度等）带来的不同响应幅度和非对称性。
+
 ### 4.2.6 Demo 统一声明
 
 在 Experiments 开头统一加入：
@@ -273,6 +298,18 @@ and pipeline-testing purposes. Unless explicitly stated otherwise, numerical
 results are synthetic placeholders rather than outcomes of actual model
 training or reproduction.
 ```
+
+### 4.2.7 Demo 模式下"真实数据 + 模拟拟合"混合可视化（案例研究/空间可视化）
+
+当 Demo 项目仍希望案例研究、pivotal 节点网络图、依赖强度热力图等可视化"看起来真实可信"（例如目标达到顶刊水平）时，推荐采用**真实原始数据 + 模拟模型输出**的混合方案，而不是全部用随机数生成：
+
+- **时间序列类**（案例研究、异常响应曲线）：从公开数据集（如 PEMS0X 的 `.npz`/`.csv`，PEMS-BAY/METR-LA 的 `.h5`）下载真实原始序列，直接用真实曲线作为 Ground Truth；模型预测/baseline 预测/偏差分数等派生量可以用真实序列 + 合理噪声/偏移模拟，但要保证形状与真实序列的转折点、峰谷对应。案例研究里选取的"异常日"应尽量对应真实可查的日期语义（如公共假日），并在图注/正文写明具体日期与理由，而不是笼统写"day index 0"。
+- **空间类**（pivotal 节点网络图、依赖强度热力图）：优先使用带有真实经纬度/邻接矩阵的数据集（如 PEMS-BAY、METR-LA 自带 `graph_sensor_locations.csv`/`adj_mx.pkl`），用 `pyproj` 转换到 Web Mercator 坐标，配合 `contextily` 加载真实地图底图（OpenStreetMap/CARTO），避免用 MDS/spring layout 等抽象布局伪造地理关系；若目标数据集本身不带 GPS（如 PEMS03/04/07/08），应换用别的、确实带 GPS 的数据集来画这类空间图，而不是在无 GPS 数据集上硬造坐标。
+- **图内文字**：不要在图的标题/坐标轴/图例中出现 "real" / "synthetic" / "simulated" 等字样去刻意强调数据来源真伪；数据来源、模拟成分的说明统一放到 `\caption{}` 或 Demo Disclaimer 里用叙述性文字交代（呼应 `WRITING_STANDARDS.md` 第 10.6 节），且该 caption 本身也不能因此夹带其他图/表的交叉引用（第 8 章）。
+- **案例研究中的对比曲线**：预测对比的第二条曲线应选择一个**真实存在的 baseline 模型名称**（如参考论文中出现过的强 baseline），而不是本文的某个 ablation 变体（如 "w/o Deviation"），因为案例研究通常是在向读者展示"本方法 vs. 其他模型"的定性差异，用消融变体做对比容易与后面的 Ablation Study 混淆分析目的。
+- 若同一类图需要展示多个数据集（如同时展示 PEMS-BAY 和 METR-LA），采用行/列分组、面板顺序统一编号（如 (a)-(c) 属于数据集 1，(d)-(f) 属于数据集 2），并在图注中明确每组面板对应哪个数据集；面板字母一律按 `WRITING_STANDARDS.md` 10.5 节的扁平序列规则连续编号，禁止 `(b1)/(b2)/(b3)` 这种嵌套编号。
+- **案例研究的节点/样本选择应覆盖代表性区间，而不是只取两个极端**：默认方案设计成"高/中/低"三档（如按 pivotal 打分选最高、中位数、最低三个节点），而不是只选"最 pivotal" vs "最不 pivotal"两个极端，因为只用两个极端容易被质疑"挑了最有利的对比"，加入一个中间档可以展示效果随该打分**渐变**而非阶跃，论证力度更强。三档可以共用同一个时间窗口/同一套面板布局（如每个节点各占一个 zoomed 对比子图），保持面板之间可直接比较。
+- 若审稿人视角下某张新图与已有图功能高度重叠（例如"随机挑几个节点看整体拟合曲线"这类通用可视化，可能与已经绑定核心创新点的案例研究图重复），优先**扩展已有图**（如把单节点案例研究扩展为多节点版本）而不是重新画一张功能重叠的新图，避免图表堆砌。
 
 ---
 
@@ -350,6 +387,11 @@ training or reproduction.
 | Demo | synthetic/placeholder | 可基于 synthetic 数字，措辞体现 Demo | 统一 Demo Disclaimer |
 
 Demo 模式的重点是：**让用户能够完整测试论文 Experiments 写作、LaTeX 表格、结果分析和整个科研写作 pipeline**。不能因为缺少真实训练日志而只生成 `XX.XX`，也不能在用户已明确 Demo 用途之后不断要求提供真实实验结果。
+
+> 基础 `experiments.tex` 完成后，如果用户觉得实验部分单薄，想再根据参考文献补充更多实验
+> 类型（鲁棒性/统计显著性/案例研究/迁移实验等），使用 `../experiments-enrichment/SKILL.md`：
+> 它会自动扫描参考文献做过的实验、按与本文创新点的相关度打分，直接选定并补写，不需要用户
+> 逐项挑选。
 
 ---
 
