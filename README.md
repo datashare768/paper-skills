@@ -71,6 +71,14 @@ SKILL.md 中出现的 `workspace/`、`papers/` 等相对路径，均指**当前�
 不要在 `paper-skills` 仓库内创建这些文件夹（`paper-skills/.gitignore` 里的 `workspace/`、
 `workspace_*/` 规则只是兜底防误提交，正确用法是压根不在这个仓库里生成）。
 
+## 项目上下文记录（跨对话迁移用）
+
+每个使用这些 skill 的论文项目目录下，建议维护一个 `PROJECT_STATUS.md`（放在项目根目录，例如
+`<你的论文项目>/PROJECT_STATUS.md`，不要放进 `paper-skills` 仓库），记录：项目主题/模型名、
+各 section 完成状态、已确定的关键规范/坑（如模板限制、表格合并方式、Demo Mode 约定）、遗留
+待办。新开对话时先读这个文件即可快速接续上下文，避免每次重新解释背景或重复踩坑。写作时保持
+简洁（一页以内），只记结论和规范，不重复贴大段正文。
+
 ## 同步到 GitHub
 
 ```bash
