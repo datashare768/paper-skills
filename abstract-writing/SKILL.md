@@ -163,7 +163,29 @@ embeddings. Building upon these representations, we propose a Gated Cross-Attent
 
 **S5 — 实验结论**（2–3 句）
 
-句型框架：
+**先看参考文献摘要怎么写，再决定要不要列数据集名/指标名/具体数值**——不要预设"必须列出具体数字"。实测统计（交通流预测领域 8 篇参考论文的摘要）显示：
+
+| 写法 | 出现频率 | 例子 |
+|------|----------|------|
+| 只说"N 个真实世界/公开数据集"，**不点名数据集，不点名指标，不给数值** | 多数（约 5/8，如 STPGNN、DSTAGNN、STADNN、DeepSTUQ、STDN） | "Experiments on seven real world traffic datasets verify our proposed method's effectiveness..." |
+| 点名数据集名称，但仍不给指标名/数值 | 少数（如 ASPMformer） | "...on five public benchmark datasets, including PeMS03, PeMS04, ..., show that ASPMformer achieves competitive and consistent improvements over strong baselines." |
+| 点名指标名称 + 具体数值（通常是分类/检测任务，AUC/F1/Recall 等一次性汇总指标，而不是回归任务在多个数据集/步长下变化的 MAE/RMSE 等指标） | 视任务类型，偏分类/检测类任务更常见 | 见下方 MPG-LLM 参考示例（Macro-AUC 0.9887 等） |
+
+判断规则：
+1. **默认不点名具体数据集、不点名具体指标、不写具体数值**，用"N widely-used public benchmarks"、"M competitive baselines"这类概括性说法——这是回归/预测类任务（时间序列预测、traffic forecasting 等，同一指标在多个数据集/多个步长下取值差异很大，无法用一两个数字概括全局结论）中的主流写法。
+2. **仅当**任务是分类/检测/排序类，有 1–2 个"一次性汇总"型指标（如整体 AUC、F1、Accuracy）且参考文献摘要普遍这样写时，才在 S5 里给出具体数值（参照下方 MPG-LLM 示例）。
+3. 拿不准时，直接读取本项目已解析的参考论文摘要段落，统计"点名数据集/指标/数值"的比例，按多数惯例执行，而不是套用固定模板。
+4. 摘要正文里不要出现 `\citep{}` 引用的数据集名（如 `PEMS03~\citep{...}`）——数据集/引用细节留给正文 Experiments 部分。
+
+句型框架 A（默认，不点名数据集/指标，回归/预测类任务推荐）：
+```
+"Extensive experiments on <N> widely-used public <domain> benchmarks [spanning <数据特征差异，可选>] show that
+\textbf{<Abbr>} consistently outperforms <M> competitive baselines, while ablation studies confirm
+the contribution of each proposed component[, and <可选：效率/泛化性等补充发现>].
+These results indicate that <核心设计思路> offers an effective mechanism for <任务目标>."
+```
+
+句型框架 B（点名指标+数值，分类/检测类任务且参考文献多数这样写时使用）：
 ```
 "Experimental results on <N> <数据集类型> datasets demonstrate that \textbf{<Abbr>}
 significantly outperforms existing state-of-the-art methods across multiple evaluation metrics,
@@ -174,7 +196,7 @@ demonstrating practical applicability in real-world scenarios."
 
 规则：
 - 数值只来自 experiments.tex，不捏造
-- 如果是 Demo Mode，用定性描述替代具体数值：
+- 如果是 Demo Mode 且采用框架 B，用定性描述替代具体数值：
   `"...consistently achieves competitive performance across all benchmarks."`
 - 末句可选："These results confirm that <核心设计思路> is both effective and generalizable."
 
@@ -187,8 +209,8 @@ demonstrating practical applicability in real-world scenarios."
 - [ ] S2 以 "However" 开头，局限与方法解决方案直接对应
 - [ ] S3 只有 1 句，模型全称和缩写与 method.tex 完全一致
 - [ ] S4 中每个核心模块对应 1 句，动词不重复
-- [ ] S5 数值来自 experiments.tex（Demo Mode 用定性描述）
-- [ ] 全文 250–350 词（不超过 400 词）
+- [ ] S5 已核对参考文献摘要的写作惯例，默认不点名具体数据集/指标/数值（回归预测类任务），仅在分类/检测类任务且参考文献多数点名时才写具体数值；数值只能来自 experiments.tex（Demo Mode 用定性描述）
+- [ ] 全文词数符合用户要求（未特别说明时目标 250–350 词，若用户要求"N 词以内"则严格数一遍单词数确认 ≤ N）
 - [ ] 不出现"In this paper, we..."流水账开头（用 S1 背景句开头）
 - [ ] 不出现 section 引用如 "Section 3"（abstract 独立于正文）
 - [ ] 不出现 `\cite{}` 引用（abstract 通常无引用）
@@ -209,6 +231,10 @@ Experimental results <S5: 实验结论，2–3句>
 ```
 
 用 `\input{abstract.tex}` 从主文档引入，或直接将内容嵌入主文档 `\begin{abstract}...\end{abstract}` 块中。
+
+> **词数核查**：用户给出具体词数上限（如"300 词以内"）时，不要凭感觉估算，写完后用脚本精确核对：
+> `python -c "print(len(open('abstract.tex', encoding='utf-8').read().split()))"`，
+> 超出则逐句精简（优先删多余的从句/形容词，不要删掉贡献点），直到严格满足限制。
 
 > **⚠️ Elsevier `cas-sc` / `cas-dc` 模板已知坑**：这两个模板的 `abstract` 环境（定义在
 > `cas-common.sty`）通过 `\verbatimwrite` 把环境体逐字符原样写入 `\jobname.abs`，再用
