@@ -1,0 +1,5 @@
+补充第15章：Introduction引用需在各段间分布均匀
+
+- WRITING_STANDARDS.md 第15章新增规则：P1（背景）、P2（挑战）不能完全没有
+  引用，应各配1-2条支撑具体论断的引用，不能把所有引用都堆在"已有方法综述"段。
+- introduction-writing/SKILL.md 同步更新写作规范提示与检查清单。

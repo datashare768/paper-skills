@@ -547,6 +547,26 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
     展开（如 `DCRNN~\citep{a}` 后紧跟 `STGCN~\citep{b}`、`T-GCN~\citep{c}`
     各自成句），这属于"逐个具名引用"而非"堆叠引用"，不受本条 2 篇上限限制
     （因为每个引用都对应一个被明确点名的方法，不是笼统地堆在同一句里）。
+- **Introduction 的引用应在各段之间分布均匀，禁止把所有引用都堆积在"已有方法
+  综述"这一段，而背景段、挑战段完全没有引用**。P1（背景与重要性）、P2（核心
+  挑战）即使不是"综述现有方法"的主体段落，也应各自带 1-2 条恰当的引用来支撑
+  具体论断，而不是空手陈述常识：
+  - P1 可以引用一篇综述或代表性文献来支撑"这是一个重要且被广泛关注的研究
+    问题"这类论断，例如 `has attracted substantial and sustained research
+    attention~\citep{jin2023spatio}`。
+  - P2 描述具体挑战（空间异质性、时间趋势与周期性等）时，应给每个挑战点配一条
+    支撑性引用，而不是纯靠自己的举例（如 on-ramp 影响下游交通）来论证，例如
+    `a form of heterogeneity that varies substantially across both space and
+    time~\citep{guo2022learning}`、`an interplay that classical statistical
+    forecasting models were among the first to explicitly target
+    ~\citep{williams2003modeling}`。
+  - 这些引用可以与 Related Work 中对应主题的引用重复（跨 Introduction 与
+    Related Work 各引用一次不算"重复"，见上一条），但不能与 Introduction
+    内部其他段落的引用重复。
+  - 检查方法：数一下 Introduction 每个段落（P1-P5，不含贡献列表和路线图段）
+    各自包含的 `\citep{}` 数量，若某段（尤其是 P1/P2）为 0，应参照上面的
+    示例补充 1-2 条与该段论断直接相关的引用，而不是任由引用全部集中在
+    "已有方法综述"段。
 - 检查方法：对 `intro.tex`/`related_work.tex`，用脚本统计每个 `\citep{}` 内
   逗号分隔的文献 key 数量，命中 3 篇及以上（且不属于"逐个具名引用"例外）时
   精简到 1-2 篇；再统计全文中每个文献 key 的出现次数，Introduction 内部或
