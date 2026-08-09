@@ -59,6 +59,18 @@ disable-model-invocation: true
 >   "following the common/standard ... protocol"）；引用只允许保留在
 >   Experimental Setup（数据集/baseline 出处）、Demo Disclaimer、以及图/表
 >   `\caption{}` 内部的可视化惯例出处说明（见 `WRITING_STANDARDS.md` 第 14 章）。
+> - **时态**：叙述"做了什么实验/观察到什么具体结果"用过去时，指向图表本身/描述
+>   模型一般性质用现在时，同一段落内不能混用两种标准（见 `WRITING_STANDARDS.md`
+>   第 16 章）。
+> - **去模板化**：不同 subsection（尤其是逐参数扫描的 Parameter Sensitivity）不能
+>   反复套用同一个抽象结论句式（如 "matches/fits the intended role of X"）或完全
+>   相同的"现象+两端失效原因+so we adopt X"段落骨架；改写时不能改动任何数字、
+>   数据集名称或结论方向（见 `WRITING_STANDARDS.md` 第 17 章）。
+> - **长句拆分**：用分号/多重从句把"做了什么+具体数字+多个原因"塞进一句话的写法
+>   必须按语义拆成 2-3 句甚至 2 个段落（见 `WRITING_STANDARDS.md` 第 18 章）。
+> - **面板引用**：涉及多面板图的分析句禁止裸写 `panel (b)`/`Panels (c)–(e)`，
+>   必须写成显式的 `Fig.~\ref{fig:xxx}(b)` 形式（见 `WRITING_STANDARDS.md`
+>   第 19 章）。
 
 调用本 skill 时，首先判断项目性质：
 

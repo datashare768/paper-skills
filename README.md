@@ -10,7 +10,8 @@
 paper-skills/
 ├── README.md
 ├── WRITING_STANDARDS.md       # 所有写作 skill 共享的强制写作规范（图表引用顺序/禁止分点
-│                               # 与破折号/一致性自检/中式英语与夸大断言/LaTeX符号/加粗规范）
+│                               # 与破折号/一致性自检/中式英语与夸大断言/LaTeX符号/加粗规范/
+│                               # 时态使用规范/去模板化收尾句/长句拆分/图表面板交叉引用规范化）
 ├── idea-and-method-writing/   # 阶段：idea 构思 + 方法部分写作
 │   ├── SKILL.md
 │   └── scripts/
@@ -50,7 +51,10 @@ paper-skills/
 `idea-and-method-writing`/`experiments-writing`/`conclusion-writing`）在起草完成后，
 都必须对照根目录的 `WRITING_STANDARDS.md` 逐条自查，涵盖：图表"先引用后出现"的顺序、
 除 Introduction 贡献点外全文禁止分点/破折号、数值与术语与逻辑的前后一致性、
-中式英语套语与无依据夸大断言、LaTeX 数学符号复用冲突、`\textbf{}` 加粗使用边界。
+中式英语套语与无依据夸大断言、LaTeX 数学符号复用冲突、`\textbf{}` 加粗使用边界、
+SCI 惯例时态统一（过去时叙述实验动作/结果，现在时描述图表本身与一般事实）、
+去模板化收尾句与机械化段落骨架（消除 AI 写作痕迹）、长句拆分、图表面板交叉引用
+规范化（禁止裸写 `panel (b)`，须写成 `Fig.~\ref{...}(b)`）。
 各 skill 的 SKILL.md 中已插入指向该文件的提示，但该文件本身是唯一权威来源，
 更新写作规范时只需改 `WRITING_STANDARDS.md`，无需逐个 skill 重复维护细节。
 

@@ -23,6 +23,10 @@ disable-model-invocation: true
 > "consistently outperforms all baselines"，应改为如实反映主表结果的可验证表述
 > （如"achieves the best or second-best result on the majority of evaluated metric
 > combinations"）。
+> 同时需检查：第一段若用一句话堆叠"提出方法+核心组件+实验结论+整体意义"多层信息，
+> 应按语义拆成 2-3 句（`WRITING_STANDARDS.md` 第 18 章）；"Extensive experiments...
+> demonstrate/demonstrated that..."这类句子的时态要统一（本文作者的实验动作/结果
+> 用过去时，一般性结论用现在时，见第 16 章）。
 
 ---
 

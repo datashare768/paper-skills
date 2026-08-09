@@ -574,6 +574,119 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
   的回指表述。新写这两节时应从一开始就按"每个文献 key 在本节内只引用一次、
   每个 `\citep` 最多 2 篇"的预算写，不要写完再回头精简。
 
+## 16. 时态使用规范（SCI 惯例，Experiments/Results/Conclusion 尤其适用）
+
+论文中"叙述本文作者做过的具体实验动作/观察到的具体结果"与"陈述一般事实/指向图表本身"
+是两类不同的时态语境，不能混用（常见反例：同一节里一半句子用过去时、一半用现在时，
+没有统一标准）。
+
+- **过去时**：描述"我们做了什么实验、观察到什么具体结果"，即本文作者执行的具体动作和
+  由该动作产生的具体观测结果，使用过去时。典型动词：`evaluated`、`trained`、`tested`、
+  `were set to`、`attained`、`improved`、`confirmed`、`showed`、`observed`、`found`、
+  `injected`、`compared`、`achieved`。
+  - `We evaluated the model on six public datasets.`
+  - `DAPGN attained the lowest MAE on four of the six datasets.`
+  - `Removing the decomposition module degraded RMSE by 4.1\%, which confirmed its
+    contribution.`
+- **现在时**：描述一般事实、方法/模型自身固有的结构性描述、以及"指向图表本身"的句子
+  （图表作为客观存在的对象，其内容用现在时描述，即使图表画的是过去做的实验）。
+  - `Table~\ref{tab:main_results} summarizes the results across all datasets.`
+  - `Fig.~\ref{fig:sensitivity}(b) plots the trend as the window length increases.`
+  - `Each curve corresponds to one dataset and shares the same $x$-axis.`
+  - `The deviation score quantifies how far the current input departs from the
+    learned reference pattern.`（模型机制本身的一般性描述）
+- **常见混用错误**：同一段落里 `We evaluate DAPGN on six datasets... Table 1 summarized
+  the results...` 属于反例（前半句该用过去时却用了现在时，后半句该用现在时却用了过去时），
+  应统一改为 `We evaluated DAPGN on six datasets... Table~\ref{tab:main_results}
+  summarizes the results...`。
+- **检查方法**：逐句判断该句属于"作者执行的具体实验动作/该动作产生的具体结果"还是
+  "一般事实/图表本身/模型固有属性"，前者统一为过去时，后者统一为现在时；重点检查
+  `experiments.tex`（Main Results/Ablation/Sensitivity/Case Study/Robustness 等分析段落）
+  和 `conclusion.tex`（"Extensive experiments... demonstrate/demonstrated that..."一类
+  句子），逐段扫描动词时态是否符合上述两分法，不一致的逐句改写为正确时态，不要整节
+  统一套用同一种时态了事。
+
+## 17. 去模板化收尾句与机械化段落骨架（消除 AI 写作痕迹）
+
+大模型/机械写作最容易暴露的痕迹是"多个小节反复套用同一个抽象结论句式"和"平行小节
+（如逐个超参数的敏感性分析）每段都用完全相同的叙事骨架"，读起来像是复制粘贴改了几个
+名词。必须遵守：
+
+- **禁止在多处结论句里反复套用同一个可替换任意名词的抽象句式**，例如
+  "X matches/fits/aligns with the intended role of Y"这类骨架，只是把 X、Y 换成不同的
+  模块名/发现对象，句式本身原地重复。命中 2 次以上时，逐条改写为**针对该发现自身具体
+  机制**的解释，不再复用同一个抽象骨架句：
+  - ✗ `This is consistent with the intended role of the deviation score.`（第一处）
+    /`This fits the intended role of the robustness modulation.`（第二处，仅替换了名词）
+  - ✓ 第一处改写为该发现自身的机制解释，例如
+    `The improvement is largest exactly where the reference pattern is most
+    frequently violated, since the deviation term receives a stronger gradient
+    signal in those regimes.`；第二处换一种论证角度，例如
+    `The robustness gap narrows as the perturbation magnitude grows, because the
+    modulation term saturates once the input departs from all stored patterns.`
+- **禁止连续多个平行小节（尤其是逐参数扫描的敏感性分析）每段都套用完全相同的
+  "现象 + 两端各自失效原因 + so we adopt X"固定叙事骨架**。即使每个参数确实呈现
+  类似的 U 形/倒 U 形趋势，也应该在开场方式、论证重点、连接词选择上做出差异，
+  不能通篇一个调子读下去：
+  - 有的段落可以从"过小时的具体后果"切入，有的段落从"过大时的具体后果"切入；
+  - 有的段落把两端原因合并成一个对比句（`while ... , ...`），有的段落分别用
+    `since`/`because` 独立说明；
+  - 采用值的交代方式也应变化（有的直接给数字，有的用"a moderate value around..."
+    这类表述），不要每段结尾都写成完全相同的固定收尾句型。
+- **强制约束**：改写措辞与句式时，**不能改动任何数字、数据集名称或最终结论方向**，
+  只调整语言组织方式本身。
+- **检查方法**：全文搜索容易被反复套用的抽象骨架短语（如
+  `matches the intended role|fits the intended role|aligns with the intended role|
+  consistent with the design of`），命中 2 次以上时逐条改写为具体到该发现自身机制的
+  解释；对 Main Results、Multi-Horizon、Efficiency、Ablation、Decomposition Strategy、
+  Robustness、Case Study、Parameter Sensitivity 等各节通读一遍，检查是否存在"逐段
+  完全相同的骨架 + 完全相同的连接词顺序"，命中则调整至少一半段落的开场方式或论证顺序，
+  使各段之间可辨识出差异。
+
+## 18. 长句拆分（禁止用分号/多重从句堆叠讲多件事）
+
+- **现象**：用分号或多重从句把"做了什么实验 + 具体数字 + 原因 A + 原因 B + 另一现象 +
+  另一原因"塞进一句话，长达四五行，读者需要反复回读才能拆解出其中包含的几层意思。
+  - ✗ `DAPGN attains the best or second-best result on five of the six datasets, with
+    the largest relative margin over the strongest baseline observed on PEMS07 and
+    PEMS03 because their denser sensor networks give the pivotal-node mechanism more
+    structure to exploit; on PEMS08, however, the margin narrows since the shorter
+    observation window limits how much periodic structure the decomposition module
+    can extract.`
+  - ✓ 拆成两句/两段：`DAPGN attains the best or second-best result on five of the six
+    datasets. The largest relative margin over the strongest baseline occurs on
+    PEMS07 and PEMS03, whose denser sensor networks give the pivotal-node mechanism
+    more structure to exploit.` 另起一句/一段：`The margin narrows on PEMS08, where
+    the shorter observation window limits how much periodic structure the
+    decomposition module can extract.`
+- **要求**：一句话原则上只承载一个核心论断；一个段落若原本用一句话讲完"总体表现 +
+  相对差距 + 表现最好的原因 + 表现较弱的原因"，应按语义拆成 2-3 句甚至 2 个段落
+  （如"总体表现"独立一句/一段，"分数据集差异及原因"另起一句/一段）。拆句后要重新检查
+  每句的时态是否符合第 16 章规则（具体结果用过去时，指向图表/一般事实用现在时）。
+- **检查方法**：逐段扫描长度超过 3-4 行、或包含 2 个以上分号/从句连接词
+  （`while`/`whereas`/`since`/`because`/`given that` 连续嵌套使用）的句子，按语义
+  节点（现象/数字、原因 A、原因 B ...）拆分为独立句子或独立段落；拆分后确认信息没有
+  丢失、每句主谓清晰、时态正确。
+
+## 19. 图表面板交叉引用规范化
+
+- **禁止裸写不带图号的面板指代**，如 `panel (b)`、`Panels (c)–(e)`、
+  `the middle panel`、`the leftmost subplot` 这类脱离具体 `\ref` 的表述——读者在正文
+  其他位置读到这句话时，无法定位这是哪张图的面板。
+- **统一写法**：显式给出图号 + 面板字母，即 `Fig.~\ref{fig:xxx}(b)`；同一张图内连续
+  多个面板可用紧凑范围写法 `Fig.~\ref{fig:xxx}(c)--(e)`（图号只需给一次，字母范围用
+  `--` 连接），跨图的面板范围才需要重复图号引用（`Fig.~\ref{fig:xxx}(c)` 与
+  `Fig.~\ref{fig:yyy}(a)` 分别给出，不能省略任一图号）。
+  - ✗ `Panel (b) shows a similar trend, while panels (c)–(e) each fail at the
+    opposite extreme.`
+  - ✓ `Fig.~\ref{fig:sensitivity}(b) shows a similar trend, while
+    Fig.~\ref{fig:sensitivity}(c)--(e) each fail at the opposite extreme.`
+- **检查方法**：全文搜索正则 `\b[Pp]anels?\b`，命中的位置检查其前后是否已经带有
+  `\ref{fig:...}`；若是裸露的方位/编号指代（`panel (b)`、`the top panel` 等）且没有
+  紧邻的 `\ref`，一律补全为显式的 `Fig.~\ref{fig:xxx}` + 面板字母引用。新写涉及多面板
+  图的分析句时应从一开始就直接写 `Fig.~\ref{fig:xxx}(b)` 这种完整形式，不要先写
+  `panel (b)` 图省事，再回头补引用。
+
 ---
 
 ## 使用方式
@@ -584,7 +697,9 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
   （`\emph{}`）/`Motivated by the lack of` 绕弯子开场/LaTeX 符号/加粗规范/
   章节交叉引用限制/caption 内禁止交叉引用/表格内禁止引用/绘图规范
   （DPI·字体·刻度·多数据集·防遮挡）/章节标题必须是名词短语（第 11 章）/
-  `\section` 开头需有引导段落（第 12 章）"**。
+  `\section` 开头需有引导段落（第 12 章）/时态使用规范（第 16 章）/去模板化收尾句
+  与机械化段落骨架（第 17 章）/长句拆分（第 18 章）/图表面板交叉引用规范化
+  （第 19 章）"**。
 - 全文搜索 `\section{`/`\subsection{`/`\subsubsection{`，逐个检查花括号内文字是否
   含主谓结构（能否独立读成一句完整的话），命中则按第 11 章改写为名词短语；新写
   标题时应从一开始就按名词短语构造，不要先写成句子再回头改。同时按标题的出现顺序
@@ -642,5 +757,18 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
   文献 key 在本节内的出现次数，按第 15 章把 3 篇以上的堆叠引用精简到 1-2 篇、
   把同一 key 在同一节内的第二次及后续引用改写为不带 `\citep` 的回指表述；
   新写这两节时应从一开始就按该密度预算写，不要写完再回头精简。
+- 对 `experiments.tex`/`conclusion.tex` 的分析性正文，逐句判断是"作者执行的具体
+  实验动作/该动作产生的具体结果"还是"一般事实/图表本身/模型固有属性"，按第 16 章
+  统一为过去时或现在时，不一致的逐句改写；新写时应直接按两分法落笔，不要写完再
+  回头统一时态。
+- 对连续多个平行小节（Main Results/Multi-Horizon/Efficiency/Ablation/Decomposition
+  Strategy/Robustness/Case Study/Parameter Sensitivity），按第 17 章检查是否反复
+  套用同一个可替换名词的抽象结论句式（如 `matches/fits/aligns with the intended
+  role of`）或完全相同的段落叙事骨架，命中则逐条改写为该发现自身的具体机制解释，
+  同时不改动任何数字、数据集名称或结论方向。
+- 逐段扫描长度超过 3-4 行或包含 2 个以上分号/从句连接词嵌套的句子，按第 18 章
+  拆分为独立句子或段落，拆分后按第 16 章重新核对每句时态。
+- 全文搜索 `\b[Pp]anels?\b`，命中的裸露面板指代（无紧邻 `\ref{fig:...}`）按第 19
+  章补全为 `Fig.~\ref{fig:xxx}(b)` 这种显式引用形式。
 - 用户提出"检查一致性/学术规范/润色语法"等类似请求时，优先读取本文件作为检查清单，
   逐段（而不是抽样）过一遍目标 `.tex` 文件。
