@@ -48,7 +48,11 @@ disable-model-invocation: true
 >   that ...` 多级 hedge 链）、`consistent with`/`plausibly`/`suggesting that`/
 >   `indicating that` 等归因短语同一段落最多出现一次、段落开头直接给出具体数字/
 >   现象而不是先铺垫再引出结论。写第一版时就应按这个密度写，不要先写冗长版本、
->   等用户反馈"太啰嗦"才回头精简。
+>   等用户反馈"太啰嗦"才回头精简；
+> - 每个 `\subsection{}`/`\subsubsection{}` 下的独立段落数量必须对照
+>   `WRITING_STANDARDS.md` 第 13.1 节控制在 1-4 段（通常 3 段），内容少时用
+>   1-2 段即可；不允许一句话单独成段，也不允许"每个子图/每个变体/每个数据集"
+>   机械地各自单独起一段，设置句应并入紧随其后的结果分析段合并成一段。
 
 调用本 skill 时，首先判断项目性质：
 
@@ -344,7 +348,11 @@ training or reproduction.
 - `consistent with`/`plausibly`/`suggesting that`/`indicating that` 等归因短语，
   同一段落最多出现一次；需要解释多个发现时换用 `since`/`because` 从句或
   `while`/`whereas` 并列句，不要每句都套同一模板。
-- 详细规则与更多改写示例见 `../WRITING_STANDARDS.md` 第 13 章。
+- 每个 `\subsection`/`\subsubsection` 下的独立段落数量控制在 1-4 段（通常 3 段），
+  内容少就用 1-2 段；禁止一句话单独成段，禁止"每个子图/每个变体/每个数据集"
+  各自机械起一段——设置句应并入紧随其后的结果分析段一起合并成一段。
+- 详细规则与更多改写示例见 `../WRITING_STANDARDS.md` 第 13 章（含 13.1 段落数量
+  控制）。
 
 ## 5.4 Main Results 分析结构（四段式，参考顶会写法）
 
