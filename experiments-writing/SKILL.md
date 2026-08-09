@@ -41,7 +41,14 @@ disable-model-invocation: true
 >   `WRITING_STANDARDS.md` 第 10 章「用脚本生成图片的绘图规范」检查 DPI（统一 600）、
 >   字体（统一 Times New Roman）、坐标轴刻度（数值跨度不均时用等间距索引位置）、
 >   是否已尽量在同一张图内展示多个代表性数据集、是否避免了遮挡与杂乱水印、
->   面板标注与字号是否规范。
+>   面板标注与字号是否规范；
+> - 所有 Main Results / Ablation / Sensitivity / Case Study 等分析段落，必须对照
+>   `WRITING_STANDARDS.md` 第 13 章「分析性论述的简洁度与信息密度规范」自查：
+>   每个发现只给一次因果解释（不堆叠 `consistent with ... in that ... suggesting
+>   that ...` 多级 hedge 链）、`consistent with`/`plausibly`/`suggesting that`/
+>   `indicating that` 等归因短语同一段落最多出现一次、段落开头直接给出具体数字/
+>   现象而不是先铺垫再引出结论。写第一版时就应按这个密度写，不要先写冗长版本、
+>   等用户反馈"太啰嗦"才回头精简。
 
 调用本 skill 时，首先判断项目性质：
 
@@ -323,23 +330,39 @@ training or reproduction.
 
 允许根据 synthetic 数字完整生成实验分析，措辞体现 Demo 属性：
 
-- 推荐："The synthetic results suggest..." / "Within this synthetic setting..." / "The demo results illustrate..."
+- 推荐："The synthetic results suggest..." / "Within this synthetic setting..." / "The demo results illustrate..."（仅在段落中出现一次，不要每段都重复同一句式）
 - 避免："Experiments prove that..." / "Our method achieves state-of-the-art..."
 
-## 5.3 Main Results 分析结构（四段式，参考顶会写法）
+## 5.3 密度基准（写第一版时就要遵守，不要写完再精简）
+
+在展开四段式/组件分析之前，先确立密度基准，逐段落笔时直接套用，避免写出冗长初稿再回头压缩：
+
+- 每个发现（一个现象 + 一个原因）用 1-2 句话说完；写到第 3 句仍在解释同一件事，
+  说明在重复表达，应合并。
+- 段落第一句直接给出具体数字/现象作为主句，不要用 `Within this synthetic
+  setting,`、`To assess whether ...` 这类铺垫状语开头。
+- `consistent with`/`plausibly`/`suggesting that`/`indicating that` 等归因短语，
+  同一段落最多出现一次；需要解释多个发现时换用 `since`/`because` 从句或
+  `while`/`whereas` 并列句，不要每句都套同一模板。
+- 详细规则与更多改写示例见 `../WRITING_STANDARDS.md` 第 13 章。
+
+## 5.4 Main Results 分析结构（四段式，参考顶会写法）
 
 1. **总体结果**：与多少 baseline 比较、覆盖多少数据集、使用哪些指标、Ours 总体表现
 2. **不同数据集**：哪些数据集优势明显/差距较小，数据集特征可能的影响
 3. **不同预测步长**（如有）：重点讨论 long-term forecasting
 4. **方法解释**：把性能趋势与 method.tex 中的具体模块对应（不能只写"因为我们方法更好"，要联系具体设计）
 
-## 5.4 Ablation 分析
+四段各自按 5.3 的密度基准控制在 3-5 句以内；同一因果解释（如"异质性更强的网络更受益于
+pivotal-node 建模"）在四段中只完整展开一次，其余段落提及时直接引用该结论而不重新论证。
 
-逐组件讨论（Full / w/o A / w/o B / w/o C），说明：性能变化绝对值/相对值、贡献最大的模块、模块互补性、与 Method 设计动机的对应。
+## 5.5 Ablation 分析
 
-## 5.5 Parameter Sensitivity 分析
+逐组件讨论（Full / w/o A / w/o B / w/o C），说明：性能变化绝对值/相对值、贡献最大的模块、模块互补性、与 Method 设计动机的对应。多个变体的排序结论（如"A > B > C > D"）用一句话给出，不要逐个变体各写一句"这证实了 X 模块很重要"再堆一句总结。
 
-说明：扫描范围、性能变化趋势、最终选择、参数过小/过大各自的问题（不够表达力 / 过拟合 / 优化困难），解释趋势而非只说"X 最好所以选 X"。
+## 5.6 Parameter Sensitivity 分析
+
+说明：扫描范围、性能变化趋势、最终选择、参数过小/过大各自的问题（不够表达力 / 过拟合 / 优化困难），解释趋势而非只说"X 最好所以选 X"。每个超参数的分析压缩为 1 个紧凑段落（现象 + 两侧成因各一句 + 采用值），不要为"过小"和"过大"两侧分别各写一整段。
 
 ---
 

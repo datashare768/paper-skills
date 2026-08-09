@@ -1,0 +1,5 @@
+新增分析性论述简洁度规范（第13章），更新 experiments-writing skill
+
+提炼自实际论文实验分析改写：每个发现只给一次因果解释，禁止堆叠
+consistent with/plausibly/suggesting that 等归因短语，段落开头直接
+给出结论而非铺垫，设置与结果句合并，参考顶刊信息密度基准。

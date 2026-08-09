@@ -401,6 +401,58 @@ related-work-writing / idea-and-method-writing / experiments-writing / conclusio
   模板补一段引导段落。新写一个 `\section` 时应从一开始就先写这段引导段落，
   不要写完所有 `\subsection` 后才回头补。
 
+## 13. 分析性论述的简洁度与信息密度规范（Experiments/Results 讨论段落尤其适用）
+
+写 Main Results / Ablation / Sensitivity / Case Study 等结果讨论段落时，最常见的顶刊水平
+反例是"同一个发现被三种不同措辞重复三次"：先叙述现象，再补一句
+`which is consistent with ...`，再补一句 `suggesting that ...`，再补一句
+`plausibly because ...`，段落显著变长但新增信息量趋近于零。必须遵守：
+
+- **每个发现（finding）只给一次因果解释**：用一个从句或一个短句说清"现象是什么 + 为什么"，
+  不要连续堆叠 `..., which is consistent with ..., in that ..., suggesting that ...`
+  这种多级 hedge 链。一个发现值得几句话，取决于它本身的信息量，不是取决于能想出多少种
+  措辞去重复同一个结论。
+- **主句直接给出具体数字/现象**，不要用大段铺垫状语开场再引出结论。
+  - ✗ `Overall, within this synthetic setting, DAPGN achieves the best or
+    second-best result on the majority of metric combinations across all six
+    datasets, while a small number of individual cells are won by strong
+    recent baselines such as STADNN and ASPMformer, which is consistent with
+    the natural variance observed among top-performing methods in the
+    literature rather than a uniform improvement pattern.`
+  - ✓ `Overall, DAPGN attains the best or second-best result on the majority
+    of metric combinations across all six datasets, with STADNN and
+    ASPMformer winning a handful of individual cells.`
+  - 铺垫性状语（如 `Within this synthetic setting`、`To assess whether ...`）
+    最多保留一个简短短语，且不作为句子的开头主导成分；不能验证/不增加信息的
+    归因分句（如"这与文献中常见的自然波动一致"）应直接删除，除非确实需要引用
+    具体文献支撑。
+- **同一个 hedge/归因连接词在同一段落中最多出现一次**：`consistent with`、
+  `plausibly`、`suggesting that`、`indicating that` 等模板短语，每段限用一次；
+  如果一段里有多个发现需要各自解释，改用不同的连接策略（直接用 `since`/`because`
+  从句陈述因果、把发现和解释合并进同一个复合句、用 `while`/`whereas` 做对比句），
+  不要让每一句结尾都套用相同的归因模板。
+- **设置陈述与结果陈述合并**：不要把"我们做了实验 X"单独写一句，再把"结果是 Y"
+  写另一句，再补一句解释；优先把实验设置压缩为结果句的从句或介词短语（如
+  `Following~\citep{...}, we inject Gaussian noise ... and compare DAPGN
+  against ASPMformer; Table~\ref{tab:robustness} reports the resulting MAE.`
+  可以进一步压缩为一句话交代协议，下一句直接给结果）。
+- **同一结论不要在同一段落里用两种句子重复确认一次以上**（例如先说"这与设计
+  动机一致"，隔两句又说"这再次证实了设计动机"）；确认一次后就应该推进到下一个
+  新信息点，而不是原地重复。
+- **多对象比较（多 baseline/多数据集/多变体）优先用同一句内的并列结构**
+  （`while`/`whereas`/`since`）合并陈述，而不是"现象1 单独一句 + 现象2 单独一句
+  + 总结句"的三段式，除非现象数量确实多到无法自然合并进一句话。
+- **参考密度基准**：顶刊/顶会论文中，单个发现通常用 1-2 句话说完（现象 + 一个
+  解释），很少超过 3 句。写分析段落时应默认假设"这个发现只值得 1-2 句话"，
+  写到第 3 句仍在解释同一件事时，应反问是否在重复表达，并合并/删除多余句子。
+
+**自检方法**：写完一版分析段落后，逐句标记该句是"新信息"还是"对前一句的重复
+确认/换个说法再说一次"；连续 2 句以上都在从不同角度重复同一个因果解释时，合并
+为 1 句并删除多余的 hedge 短语。也可以用正则
+`consistent with|plausibly|suggesting that|indicating that` 逐段统计命中次数，
+同一段落命中 ≥ 2 次时逐条判断是否需要合并或删除；用正则
+`Within this (synthetic|demo) setting|it is worth noting` 等铺垫套语确认清零。
+
 ---
 
 ## 使用方式
@@ -451,5 +503,11 @@ related-work-writing / idea-and-method-writing / experiments-writing / conclusio
   之后是否紧跟一段引导段落而非直接进入第一个 `\subsection`；若缺失，按第 12
   章的模板（点名方法/内容范围 + 本节路线图）补一段，新写一个 `\section` 时
   应从一开始就先写这段引导段落。
+- 对 Experiments/Results 等分析性讨论段落，按第 13 章统计
+  `consistent with|plausibly|suggesting that|indicating that` 等归因短语在
+  同一段落内的命中次数，≥ 2 次的段落逐条合并/精简；同时检查每段第一句是否
+  被铺垫状语（如 `Within this synthetic setting`）占据主导位置，命中则改写为
+  结论直接开头。新写分析段落时应从一开始就按"每个发现 1-2 句、每段最多一次
+  归因短语"的密度写，不要先写冗长版本再回头精简。
 - 用户提出"检查一致性/学术规范/润色语法"等类似请求时，优先读取本文件作为检查清单，
   逐段（而不是抽样）过一遍目标 `.tex` 文件。
