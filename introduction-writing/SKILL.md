@@ -24,6 +24,11 @@ disable-model-invocation: true
 > 特别注意：**只有贡献点列表（contributions）可以用 `enumerate`/`itemize`**，
 > 其余段落（背景、挑战、现有方法综述、动机、方法概述）必须是连续散文，不能出现
 > `(i)(ii)(iii)`、`First,/Second,/Third,` 等分点式表达，也不能使用破折号插入语。
+> 另需对照 `WRITING_STANDARDS.md` 第 15 章自查引用密度：单个 `\citep{}` 内最多
+> 堆叠 2 篇文献（不能一次性列出 3 篇以上笼统支撑一句泛化陈述）；同一篇文献在
+> Introduction 内部不应被重复引用两次以上（如 P3 综述某方法时已引用过，P4/末段
+> 再次提到同一方法时改用 "the ... methods above/introduced earlier" 回指，不要
+> 重新贴一次 `\citep`）。
 
 ---
 
@@ -107,6 +112,8 @@ Baseline 数量: M 个，类别
 - 应用价值切入型：`"<Task> has become increasingly critical for <application domain>, enabling <downstream benefit>~\cite{...}. ..."`
 - 数据/规模切入型：`"The proliferation of <data type> has created new opportunities for <task>~\cite{...}. ..."`
 - 技术背景切入型：`"Accurate <task> is a fundamental problem in <domain>, attracting significant research attention~\cite{...}. ..."`
+
+每个 `\cite{}`/`\citep{}` 最多带 1-2 篇文献，不要在这里堆 3 篇以上笼统背书。
 
 末句必须点出任务的核心难点引子，为 P2 铺垫。
 
@@ -215,7 +222,9 @@ future research directions.
 
 ## 写作质量检查清单（输出前逐项确认）
 
-- [ ] P1 的引用 ≥ 2 篇，来自 references.bib
+- [ ] P1 的引用 ≥ 2 篇，来自 references.bib，但单个 `\citep{}` 内不超过 2 篇
+- [ ] 全文没有同一篇文献在 Introduction 内被重复引用两次以上（第二次提及时改用
+      "the ... methods above" 等回指表述，而不是重复贴 `\citep`）
 - [ ] P2 的挑战数量与 method.tex 中的模块数量对应（1对1或多对1）
 - [ ] P3 的方法分类与参考论文 Introduction 的分类方式一致
 - [ ] P4 末句明确说明"这导致我们提出..."，不含方法细节

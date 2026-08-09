@@ -27,6 +27,12 @@ disable-model-invocation: true
 > 概括这一节要综述哪几条技术路线（对应各 subsection 主题）并说明会指出局限、
 > 将本文方法与之对比，不能直接从第一个 `\subsection` 开始（见
 > `WRITING_STANDARDS.md` 第 12 章）。
+> 另需对照 `WRITING_STANDARDS.md` 第 15 章自查引用密度：单个 `\citep{}` 内最多
+> 堆叠 2 篇文献，禁止一次性列出 3 篇以上笼统支撑一句泛化陈述（若确实要提及 3 个
+> 以上具体方法，应逐个具名分别成句引用，如 `DCRNN~\citep{a}` 后紧跟
+> `STGCN~\citep{b}` 各自成句，而不是堆在同一句同一个 `\citep` 里）；同一篇文献
+> 在 Related Work 内部（跨 subsection）也不应被重复引用两次以上，除非该文献
+> 在两个 subsection 里分别被赋予了不同的、值得单独讨论的技术角色。
 
 ---
 
@@ -138,12 +144,16 @@ python scripts/fetch_bibtex.py raw_refs.json \
 
 ```
 句1: 领域/方向的背景句（范围限定）
-句2–3: 早期/基础代表方法，指出贡献 [cite1, cite2, cite3]
-句4–5: 中期进展，技术演化 [cite4, cite5, cite6]
-句6–7: 近期 SOTA，最接近本文的工作 [cite7, cite8]
+句2–3: 早期/基础代表方法，逐个具名成句引用 [cite1]、[cite2]
+句4–5: 中期进展，技术演化，逐个具名成句引用 [cite3]、[cite4]
+句6–7: 近期 SOTA，最接近本文的工作，逐个具名成句引用 [cite5]、[cite6]
 句8: 指出现有方法共同局限，过渡句（"However, ..."），不超过 1 句
 （不要在 Related Work 里过多宣传自己方法，只需最后一句简要说"In contrast, our method..."）
 ```
+
+**每句最多带 1-2 个 `\citep{}`**；如果某句要笼统概括一类方法的共同特征而非逐个
+点名，最多在这一句的单个 `\citep{}` 里放 2 篇代表性文献，其余方法应换到别的句子
+里逐个具名展开，而不是全部堆进同一个 `\citep{a,b,c,d}`。
 
 ### 引用分配原则
 
@@ -154,7 +164,9 @@ python scripts/fetch_bibtex.py raw_refs.json \
 | Subsection 3 | 10–15 篇 |
 | 合计 | **40–50 篇** |
 
-同一篇文献可以在多个 subsection 都引用（跨主题相关时）。
+同一篇文献原则上只在一个 subsection 中引用一次；仅当该文献在两个 subsection
+分别承担不同、都值得展开讨论的技术角色时才允许跨 subsection 各引用一次，不要
+因为"跨主题相关"就顺手在每个相关 subsection 里都重复贴一次引用。
 
 ### 写作风格要求（参考顶会顶刊 Related Work）
 

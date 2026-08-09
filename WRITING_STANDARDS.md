@@ -484,6 +484,76 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
   落在 1-4 段（通常 3 段）区间内。新写一个 `\subsection` 时应从一开始就按这个
   段落数量预算规划内容分组，不要先按"每个点一段"写完再回头合并。
 
+## 14. Experiments/Results 分析正文禁止引用文献
+
+- **Main Results / Multi-Horizon / Computational Efficiency / Ablation Study /
+  Robustness / Case Study / Parameter Sensitivity 等结果讨论正文中，禁止出现
+  `\citep{}`/`\cite{}`/`\citet{}`**，包括用于"协议/惯例来源说明"的引用，例如
+  `Following~\citep{kong2024stpgnn}, we report performance averaged...`、
+  `consistent with the analogous finding in sequence forecasting~\citep{...}`。
+  结果分析应该完全基于本文自己的数据说话，不需要靠援引其他论文来"背书"某个
+  发现或某个实验设置的合理性。
+  - ✗ `Following the efficiency comparison protocol adopted in prior
+    work~\citep{kong2024stpgnn,wang2026stadnn}, we report...`
+  - ✓ `Following the common efficiency comparison protocol, we report...`
+  - 常见改法：直接删掉 `~\citep{...}`，把"follows X的协议"改写为
+    "follows the common/standard ... protocol"这类不依赖具体文献背书的表述；
+    若引用的是经典方法名称本身（如 `STL~\citep{cleveland1990stl}`），也直接
+    去掉引用，只保留方法名（该方法通常已在 Related Work 中正式引用过一次）。
+- **例外（允许保留引用的部分）**：
+  - **Experimental Setup**（Datasets、Baselines、Evaluation Metrics、
+    Implementation Details 等小节）：数据集来源、baseline 方法出处、评估协议
+    的原始定义，属于客观信息陈述而非"分析"，可以正常引用。
+  - **Demo Disclaimer / 数据来源声明**：说明数据来自哪个公开数据集镜像时的
+    引用可以保留。
+  - **图/表 `\caption{}`**：说明某个可视化风格/图表布局借鉴自某篇文献的
+    惯例（如 `following the visualization convention of STPGNN Fig.~4
+    ~\citep{kong2024stpgnn}`）可以保留在 caption 里，但**不要在正文引导句里
+    重复同一条引用**（正文只需说"following a common ... convention"，具体
+    出处留给 caption 说明一次即可，避免同一引用在正文和 caption 里各出现
+    一次造成重复）。
+- 检查方法：对 `experiments.tex`（或对应实验章节文件），从 Experimental Setup
+  小节结束处开始，逐段搜索 `\citep`/`\cite`/`\citet`，命中的位置除了
+  figure/table caption 外，一律按上面的方法删除或改写为不含具体文献引用的
+  表述；新写实验分析段落时应从一开始就不引用文献，不要写完再回头删。
+
+## 15. Introduction / Related Work 引用密度规范：禁止重复引用同一文献、禁止单次堆叠大量文献
+
+- **同一篇文献在 Introduction 内部、或 Related Work 内部，不应被
+  `\citep{}` 重复引用两次以上**（跨 Introduction 与 Related Work 之间允许
+  各自引用一次，因为两节的引用服务于不同论证目的：Introduction 是概述
+  gap，Related Work 是逐个方法的详细定位）。常见的误用场景是"第一段列举
+  相关方法时引用一次，第二段总结局限时把同一批文献再引用一次"：
+  - ✗ `...pattern repositories~\citep{cao2026adaptive}. ... Decomposition-based
+    and pattern-matching methods~\citep{cao2025spatiotemporal,wang2026stadnn,
+    cao2026adaptive} compare the current input against a reference...`
+  - ✓ 第二次提及时改为不带引用的回指表述：`...pattern
+    repositories~\citep{cao2026adaptive}. ... The decomposition-based and
+    pattern-matching methods above compare the current input against a
+    reference...`（用 `above`/`introduced earlier`/`these methods` 等回指
+    短语代替重复引用）。
+- **单个 `\citep{}` 内最多堆叠 2 篇文献，禁止一次性列出 3 篇及以上文献来
+  笼统支撑一句泛化陈述**（"citation dump"）：
+  - ✗ `representing sensors as graph nodes and their interactions as
+    edges~\citep{li2018diffusion,yu2018spatio,wu2019graph,bai2020adaptive}`
+    （4 篇文献堆在一起，读者无法分辨每篇分别对应什么贡献）。
+  - ✓ 精简到 1-2 篇最具代表性的文献：
+    `~\citep{li2018diffusion,bai2020adaptive}`；其余方法若确有必要单独提及，
+    应在 Related Work 中逐个点名（`DCRNN~\citep{...}`、`STGCN~\citep{...}`
+    分别成句），而不是在 Introduction 里囫囵吞枣式地一次引用一大串。
+  - **例外**：Related Work 中给出"综述/基础工具"性质的引用时（如
+    `foundational spectral and spatial graph operators~\citep{a,b}`）仍受
+    2 篇上限约束；若确实需要提及 3 个以上具体方法且每个方法都要单独命名
+    展开（如 `DCRNN~\citep{a}` 后紧跟 `STGCN~\citep{b}`、`T-GCN~\citep{c}`
+    各自成句），这属于"逐个具名引用"而非"堆叠引用"，不受本条 2 篇上限限制
+    （因为每个引用都对应一个被明确点名的方法，不是笼统地堆在同一句里）。
+- 检查方法：对 `intro.tex`/`related_work.tex`，用脚本统计每个 `\citep{}` 内
+  逗号分隔的文献 key 数量，命中 3 篇及以上（且不属于"逐个具名引用"例外）时
+  精简到 1-2 篇；再统计全文中每个文献 key 的出现次数，Introduction 内部或
+  Related Work 内部命中 ≥ 2 次时，把第二次及之后的引用改写为不带 `\citep`
+  的回指表述。新写这两节时应从一开始就按"每个文献 key 在本节内只引用一次、
+  每个 `\citep` 最多 2 篇"的预算写，不要写完再回头精简。
+
 ---
 
 ## 使用方式
@@ -544,5 +614,13 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
   数量（不含 table/figure 环境），超过 4 段或存在只有 1 句话的孤立段落时，按
   "设置句并入结果句、平行子分析各自合并成一段"的方法重写至 1-4 段（通常 3 段）；
   新写时应从一开始就按段落数量预算规划内容，不要写完再回头合并。
+- 对 Experiments 章节，从 Experimental Setup 结束处开始逐段搜索
+  `\citep`/`\cite`/`\citet`，命中位置除 figure/table caption 外一律按第 14
+  章删除或改写为不含具体文献的表述；新写实验分析段落时应从一开始就不引用
+  文献，不要写完再回头删。
+- 对 `intro.tex`/`related_work.tex`，统计每个 `\citep{}` 内文献数量与每个
+  文献 key 在本节内的出现次数，按第 15 章把 3 篇以上的堆叠引用精简到 1-2 篇、
+  把同一 key 在同一节内的第二次及后续引用改写为不带 `\citep` 的回指表述；
+  新写这两节时应从一开始就按该密度预算写，不要写完再回头精简。
 - 用户提出"检查一致性/学术规范/润色语法"等类似请求时，优先读取本文件作为检查清单，
   逐段（而不是抽样）过一遍目标 `.tex` 文件。

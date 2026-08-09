@@ -53,6 +53,12 @@ disable-model-invocation: true
 >   `WRITING_STANDARDS.md` 第 13.1 节控制在 1-4 段（通常 3 段），内容少时用
 >   1-2 段即可；不允许一句话单独成段，也不允许"每个子图/每个变体/每个数据集"
 >   机械地各自单独起一段，设置句应并入紧随其后的结果分析段合并成一段。
+> - **Experimental Setup 之后的所有分析正文（Main Results/Efficiency/Ablation/
+>   Robustness/Case Study/Sensitivity）禁止出现 `\citep`/`\cite`/`\citet`**，
+>   包括"following the protocol of~\citep{...}"这类协议背书式引用（改写为
+>   "following the common/standard ... protocol"）；引用只允许保留在
+>   Experimental Setup（数据集/baseline 出处）、Demo Disclaimer、以及图/表
+>   `\caption{}` 内部的可视化惯例出处说明（见 `WRITING_STANDARDS.md` 第 14 章）。
 
 调用本 skill 时，首先判断项目性质：
 
