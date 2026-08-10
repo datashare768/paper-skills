@@ -74,6 +74,18 @@ related-work-writing / idea-and-method-writing / experiments-writing / conclusio
 - **中式英语套语**（必须删除或改写）：如 `it is worth noting that`、
   `plays a vital/crucial/important role`、堆砌的 `In this paper, we...` 开头、
   滥用的 `In recent years,`、`With the rapid development of...` 等空洞套语。
+- **机械性填充开头（正文叙述中一律禁用）**：`It is worth noting that`、
+  `Note that`、`Importantly,`、`In other words,`、`It should be emphasized
+  that` 等填充性句子开头，删掉后直接陈述内容本身即可（内容不因删除这些
+  开头而丢失任何信息）。若确需转述/换一种说法，把两种说法合并成一句，
+  而不是用 `In other words` 把同一意思复述两遍。写完后用正则
+  `[Nn]ote that|worth noting|Importantly|In other words` 全文检索，
+  正文叙述中的命中一律删除或改写（定理/算法环境中的规约性 Note 可保留）。
+- **强调词不滥用**：`exactly`、`precisely`、`crucially`、`critically`、
+  `notably` 等强调副词，仅在承载关键技术含义（如 "outputs exactly zero
+  under normal conditions" 中 exactly 是数学性质的一部分）时使用，
+  一处至多一次；不得用它们对同一事实重复强调，也不得作为纯修辞加强语气。
+  斜体/加粗的对应限制见本章 `\emph{}` 规则与第 6 章。
 - **夸大与无依据断言**：`significantly`、`greatly`、`remarkably` 等程度副词若无
   数据支撑必须删除或替换为可验证的表述；`consistently outperforms all baselines`
   类断言必须与表格数据核对，改为"achieves the best or second-best result on the
@@ -633,6 +645,11 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
     `since`/`because` 独立说明；
   - 采用值的交代方式也应变化（有的直接给数字，有的用"a moderate value around..."
     这类表述），不要每段结尾都写成完全相同的固定收尾句型。
+- **禁止连续多段用相同句式开头**：连续 2 段以上都以同一模板开头（如每段都是
+  `The variant w/o X ...`、每段都是 `Fig.~\ref{...}(a) shows ...`、每段都是
+  `On dataset X, ...`）即视为公式化排比，必须改变其中至少一半段落的开场句式
+  节奏（把图表引用挪到句中、把变体名称放到句子宾语位置、用对比句合并两个
+  变体等），保持信息不变、句式可辨识地不同。
 - **强制约束**：改写措辞与句式时，**不能改动任何数字、数据集名称或最终结论方向**，
   只调整语言组织方式本身。
 - **检查方法**：全文搜索容易被反复套用的抽象骨架短语（如
@@ -659,6 +676,10 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
     more structure to exploit.` 另起一句/一段：`The margin narrows on PEMS08, where
     the shorter observation window limits how much periodic structure the
     decomposition module can extract.`
+- **硬性阈值**：一句话只表达一个核心意思；**含两个以上从句、或长度超过约 40 词
+  的句子必须拆分**。尤其要拆掉 `which ..., in that ..., thereby ...` 这类层层
+  嵌套的从句链（一个主句后面挂两个以上 which/in that/thereby/such that 从句），
+  把每层从句改写为独立句子或并入相邻句子。
 - **要求**：一句话原则上只承载一个核心论断；一个段落若原本用一句话讲完"总体表现 +
   相对差距 + 表现最好的原因 + 表现较弱的原因"，应按语义拆成 2-3 句甚至 2 个段落
   （如"总体表现"独立一句/一段，"分数据集差异及原因"另起一句/一段）。拆句后要重新检查
@@ -687,6 +708,93 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
   图的分析句时应从一开始就直接写 `Fig.~\ref{fig:xxx}(b)` 这种完整形式，不要先写
   `panel (b)` 图省事，再回头补引用。
 
+## 20. 去除防御性、辩解性表达（语气规范）
+
+论文语气应是中性的事实陈述，不应带有"预防审稿人挑刺"或"为自己辩解"的防御姿态。
+逐条排查并删除以下五类表达：
+
+- **不解释"我们为什么没做某事"**：如 `which we do not replicate here for table
+  compactness`、`we omit ... for brevity` 这类句子直接删除；读者不需要知道
+  被舍弃的选项，也不需要作者交代取舍理由。
+- **不预防性地回应假想质疑**：删除为预防审稿人挑刺而写的句子，如
+  `The three datasets are not expected to respond identically...`、
+  `without fabricating intermediate points`、`no points are plotted there`。
+  事实陈述一次即可，不做二次辩护；如果一个事实需要说明，就正面说明一次，
+  不要以"否认某种错误做法"的否定句式来说明。
+- **不用辩解性尾句**：`...rather than being tuned to a single data regime`、
+  `...rather than being specific to X`、`...for direct comparability` 这类
+  否定式、目的式尾巴，若删掉后主句意思不变，一律删掉。判断方法：把尾巴遮住
+  重读主句，若信息完整，尾巴即冗余。
+- **不自我表扬**：删除 `justify that trade-off`、`most demanding test`、
+  `strong evidence for` 这类作者自己下的价值判断；把结论留给数据，需要
+  归因时用中性动词（如用 `reflecting` 替代 `which is the price of`）。
+- **不过度罗列**：前一句已表达完整信息时，不再补充枚举式细节（如已说明
+  "只在 4 个检查点标注"，就不要再罗列其余不存在的刻度逐一说明"没有标注"）。
+- **检查方法**：全文搜索正则
+  `rather than being|for (table )?compactness|for brevity|for direct
+  comparability|not expected to|without fabricating|no .* are plotted`，
+  命中的位置逐条判断：删掉后主句意思不变的一律删除；确属必要信息的改写为
+  正面的中性陈述（一次，不重复）。
+
+## 21. 结果段落的功能分层与主题句规范
+
+Main Results 等核心结果小节的段落组织，按功能分层而不是按图表/数据集机械切分：
+
+- **主结果建议三段式**：①总体结果 + 统计显著性（结果是什么、是否可信）；
+  ②结果差异的内在规律（何处好、何处差、为什么）；③泛化性验证 + 机制归因
+  （收束到方法的核心设计）。该分层与第 13.1 节的段落数量预算（通常 3 段）
+  天然吻合。
+- **每段有单一主题句**：段首（或紧邻段首）一句话点明本段主题，段内所有
+  句子服务于该主题；发现"这句其实在讲另一件事"时，把它挪到所属主题的段落，
+  而不是就地展开。
+- **机制解释归入机制段**：对"为什么好/为什么差"的机制归因集中放在负责
+  归因的段落（三段式中的②或③），不要散落在逐条报数的结果描述句之间，
+  造成"报一个数、解释一句、再报一个数"的碎片化节奏。
+- **表格引言不单独成段**：`Table~\ref{...} reports ...` 这类引导句并入
+  首段作为开头句，不允许它自己占一段（与第 13.1 节"禁止一句话单独成段"
+  一致）。
+- **检查方法**：写完 Main Results 后，为每段写出一行主题概括（总体结果/
+  差异规律/泛化与机制），若某段无法用单一主题概括、或两段主题相同，按
+  上述分层重新归组。
+
+## 22. 实验章节禁止交叉引用方法章节的编号
+
+第 7 章已禁止 `Section~\ref`；本章进一步约束**跨章节的公式编号引用**，
+使实验章节可独立阅读：
+
+- **Experiments 章节（含其中的图表 caption）不得引用方法章节的公式编号**：
+  不写 `Eq.~\eqref{eq:deviation}`（该 label 定义在 method.tex 中）这类
+  跨章节公式引用，也不引用方法章节的算法/定理编号。
+- **替代写法**：用自包含的文字复述所指对象或其关键性质，例如
+  `the scale factor $\gamma$ of the deviation score`、
+  `consistent with the one-sided design of the deviation score, which
+  outputs exactly zero under normal conditions`——复述关键性质而非编号，
+  读者无需翻回方法章节即可理解。
+- **实验章节内部引用不受限**：Experiments 章节内部可正常引用本章自己定义
+  的表、图和公式（如评估指标的定义式 `\eqref{eq:mae}`）。
+- **检查方法**：对 `experiments.tex` 搜索 `\eqref`/`Eq.`，命中的 label 若
+  定义在方法章节文件中，一律按上面的替代写法改写为文字复述；新写实验分析
+  时应从一开始就用复述，不要先写编号引用再回头改。
+
+## 23. 正文禁止用数学/程序符号代替文字与数值书写一致性
+
+- **排序/比较关系用文字而非符号**：正文（含 caption）不写 `A > B > C` 表示
+  排序或大小关系，改用文字叙述，如 `with A first, followed by B and C` 或
+  `A outperforms B, which in turn outperforms C`。数学环境（`$...$`、
+  equation）内的不等号是数学内容本身，不受此限制。
+- **禁用符号化缩写代替连接词**：正文不用 `&` 代替 and、不用 `→` / `->`
+  表示"变为/导致"、不用 `w.r.t.`（写 `with respect to`）、`resp.`、`cf.`
+  等缩写符号；`vs.` 在图表标题/图例中可用，正文优先写 `versus` 或改写为
+  对比句。
+- **数值书写全篇一致**：千位分隔方式（`16,992` 还是 `16992`）、数值与单位
+  之间的空格（`5 min`、`30\%`）、百分号用法（`\%` 与 `percent`）、小数
+  位数（同一指标同一表内位数一致）在全文范围内保持同一约定；确定约定后
+  逐处统一，不允许同一数值风格在不同章节漂移。
+- **检查方法**：全文搜索正则 ` [<>] |w\.r\.t\.|resp\.| & |→|->`（排除
+  数学环境、tabular 列分隔符 `&` 与 LaTeX 命令内部），命中的正文位置一律
+  按上面的替代写法改写；再抽取全文所有带千位/单位/百分号的数值，核对
+  书写风格是否一致。
+
 ---
 
 ## 使用方式
@@ -699,7 +807,8 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
   （DPI·字体·刻度·多数据集·防遮挡）/章节标题必须是名词短语（第 11 章）/
   `\section` 开头需有引导段落（第 12 章）/时态使用规范（第 16 章）/去模板化收尾句
   与机械化段落骨架（第 17 章）/长句拆分（第 18 章）/图表面板交叉引用规范化
-  （第 19 章）"**。
+  （第 19 章）/防御性辩解性表达（第 20 章）/结果段落功能分层（第 21 章）/
+  实验章节禁止引用方法章节编号（第 22 章）/符号与数值书写规范（第 23 章）"**。
 - 全文搜索 `\section{`/`\subsection{`/`\subsubsection{`，逐个检查花括号内文字是否
   含主谓结构（能否独立读成一句完整的话），命中则按第 11 章改写为名词短语；新写
   标题时应从一开始就按名词短语构造，不要先写成句子再回头改。同时按标题的出现顺序
@@ -770,5 +879,22 @@ Experiments/Results 讨论部分另一个常见反例是"过度切分段落"：�
   拆分为独立句子或段落，拆分后按第 16 章重新核对每句时态。
 - 全文搜索 `\b[Pp]anels?\b`，命中的裸露面板指代（无紧邻 `\ref{fig:...}`）按第 19
   章补全为 `Fig.~\ref{fig:xxx}(b)` 这种显式引用形式。
+- 全文搜索 `[Nn]ote that|worth noting|Importantly|In other words` 与
+  `exactly|precisely|crucially`，前者在正文叙述中的命中一律按第 4 章删除
+  机械性开头；后者逐条确认是否承载关键技术含义，纯修辞强调一律删除。
+- 全文搜索 `rather than being|for (table )?compactness|for brevity|for direct
+  comparability|not expected to|without fabricating`，命中的位置按第 20 章
+  逐条判断：删掉后主句意思不变的辩解性尾句/预防性辩护一律删除；同时通读
+  结果讨论段落，删除 `justify that trade-off`、`most demanding test` 等
+  自我表扬式价值判断，改用中性归因动词。
+- 对 Main Results 等核心结果小节，按第 21 章检查段落是否按"总体结果与显著性/
+  差异规律/泛化与机制归因"功能分层、每段是否有单一主题句、表格引言是否并入
+  首段而非单独成段。
+- 对 `experiments.tex` 搜索 `\eqref`/`Eq.`/`Section~\ref`，其中指向方法章节
+  的公式/章节编号引用一律按第 22 章改写为自包含的文字复述（复述关键性质而非
+  编号）；本章内部的表、图和指标定义公式引用可保留。
+- 全文搜索 ` [<>] |w\.r\.t\.|resp\.|→|->` 及正文中作连接词用的 `&`，命中位置
+  按第 23 章改写为文字表述；同时抽查千位分隔、单位空格、百分号与小数位数是否
+  全篇一致。
 - 用户提出"检查一致性/学术规范/润色语法"等类似请求时，优先读取本文件作为检查清单，
   逐段（而不是抽样）过一遍目标 `.tex` 文件。
